@@ -24,22 +24,18 @@ import androidx.compose.ui.unit.sp
 import com.example.dialektapp.R
 import com.example.dialektapp.domain.model.DailyStreakData
 import com.example.dialektapp.domain.model.DayState
+import com.example.dialektapp.presentation.screens.home.viewmodel.HomeViewModel
 import com.example.dialektapp.ui.theme.*
 
 private val TileSpacing = 12.dp
 
 @Composable
 fun DailyStreakSection(
+    viewModel: HomeViewModel
 ) {
-    // Тимчасові mock дані
-    val mockStreakData = remember {
-        DailyStreakData(
-            activeDay = 3,
-            totalDays = 7,
-            isTodayClaimAvailable = true,
-            todayRewardAmount = 50
-        )
-    }
+    val uiState by viewModel.uiState.collectAsState()
+    val streakData = uiState.streakData
+
     val listState = rememberLazyListState()
     var isVisible by remember { mutableStateOf(false) }
     var showRewardDialog by remember { mutableStateOf(false) }
@@ -48,122 +44,185 @@ fun DailyStreakSection(
         isVisible = true
     }
 
-    LaunchedEffect(mockStreakData.activeDay) {
-        if (mockStreakData.activeDay > 2) {
-            listState.animateScrollToItem(
-                index = maxOf(0, mockStreakData.activeDay - 3),
-                scrollOffset = 0
-            )
+    LaunchedEffect(streakData?.activeDay) {
+        streakData?.let {
+            if (it.activeDay > 2) {
+                listState.animateScrollToItem(
+                    index = maxOf(0, it.activeDay - 3),
+                    scrollOffset = 0
+                )
+            }
         }
     }
 
-    AnimatedVisibility(
-        visible = isVisible,
-        enter = slideInVertically(
-            animationSpec = tween(800, delayMillis = 300),
-            initialOffsetY = { it / 2 }
-        ) + fadeIn(
-            animationSpec = tween(800, delayMillis = 300)
-        ) + scaleIn(
-            animationSpec = tween(800, delayMillis = 300),
-            initialScale = 0.9f
-        )
-    ) {
+    // Показуємо loader якщо дані завантажуються
+    if (uiState.isLoadingStreak) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = if (mockStreakData.isTodayClaimAvailable) {
-                    StreakCardBackground.copy(alpha = 0.9f)
-                } else StreakCardBackground
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = if (mockStreakData.isTodayClaimAvailable) 12.dp else 8.dp
-            ),
-            border = if (mockStreakData.isTodayClaimAvailable) {
-                BorderStroke(
-                    2.dp,
-                    Brush.horizontalGradient(
-                        colors = listOf(
-                            StreakRewardGold.copy(alpha = 0.6f),
-                            StreakRewardGold,
-                            StreakRewardGold.copy(alpha = 0.6f)
-                        )
-                    )
-                )
-            } else null
+            colors = CardDefaults.cardColors(containerColor = StreakCardBackground)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .height(200.dp),
+                contentAlignment = Alignment.Center
             ) {
-                if (mockStreakData.isTodayClaimAvailable) {
-                    RewardNotification(
-                        activeDay = mockStreakData.activeDay,
-                        modifier = Modifier.align(Alignment.TopEnd)
-                    )
-                }
+                CircularProgressIndicator(color = StreakRewardGold)
+            }
+        }
+        return
+    }
 
-                Column {
-                    // Анімований заголовок
-                    AnimatedVisibility(
-                        visible = isVisible,
-                        enter = slideInHorizontally(
-                            animationSpec = tween(600, delayMillis = 600),
-                            initialOffsetX = { -it / 2 }
-                        ) + fadeIn(
-                            animationSpec = tween(600, delayMillis = 600)
+    // Показуємо помилку якщо є
+    if (uiState.streakError != null) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = StreakCardBackground)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = uiState.streakError ?: "Помилка завантаження",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextPrimaryDark
+                    )
+                    Button(
+                        onClick = { viewModel.loadStreak() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = StreakRewardGold,
+                            contentColor = TextPrimaryDark
                         )
                     ) {
-                        Text(
-                            text = "Щоденна активність",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = TextPrimaryDark,
-                            fontWeight = FontWeight.Bold
+                        Text("Спробувати знову")
+                    }
+                }
+            }
+        }
+        return
+    }
+
+    // Показуємо streak якщо дані завантажені
+    streakData?.let { data ->
+        AnimatedVisibility(
+            visible = isVisible,
+            enter = slideInVertically(
+                animationSpec = tween(800, delayMillis = 300),
+                initialOffsetY = { it / 2 }
+            ) + fadeIn(
+                animationSpec = tween(800, delayMillis = 300)
+            ) + scaleIn(
+                animationSpec = tween(800, delayMillis = 300),
+                initialScale = 0.9f
+            )
+        ) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (data.isTodayClaimAvailable) {
+                        StreakCardBackground.copy(alpha = 0.9f)
+                    } else StreakCardBackground
+                ),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = if (data.isTodayClaimAvailable) 12.dp else 8.dp
+                ),
+                border = if (data.isTodayClaimAvailable) {
+                    BorderStroke(
+                        2.dp,
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                StreakRewardGold.copy(alpha = 0.6f),
+                                StreakRewardGold,
+                                StreakRewardGold.copy(alpha = 0.6f)
+                            )
+                        )
+                    )
+                } else null
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    if (data.isTodayClaimAvailable) {
+                        RewardNotification(
+                            activeDay = if (data.activeDay == 0) 1 else data.activeDay,
+                            modifier = Modifier.align(Alignment.TopEnd)
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Column {
+                        AnimatedVisibility(
+                            visible = isVisible,
+                            enter = slideInHorizontally(
+                                animationSpec = tween(600, delayMillis = 600),
+                                initialOffsetX = { -it / 2 }
+                            ) + fadeIn(
+                                animationSpec = tween(600, delayMillis = 600)
+                            )
+                        ) {
+                            Text(
+                                text = "Щоденна активність",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = TextPrimaryDark,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
 
-                    LazyRow(
-                        state = listState,
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(TileSpacing),
-                        contentPadding = PaddingValues(horizontal = 8.dp)
-                    ) {
-                        itemsIndexed((1..mockStreakData.totalDays).toList()) { index, dayNumber ->
-                            val dayState = when {
-                                dayNumber < mockStreakData.activeDay -> DayState.Completed
-                                dayNumber == mockStreakData.activeDay -> DayState.Active
-                                else -> DayState.Upcoming
-                            }
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                            AnimatedVisibility(
-                                visible = isVisible,
-                                enter = scaleIn(
-                                    animationSpec = tween(
-                                        durationMillis = 400,
-                                        delayMillis = minOf(800 + index * 50, 2000)
-                                    ),
-                                    initialScale = 0.5f
-                                ) + fadeIn(
-                                    animationSpec = tween(
-                                        durationMillis = 400,
-                                        delayMillis = minOf(800 + index * 50, 2000)
+                        LazyRow(
+                            state = listState,
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(TileSpacing),
+                            contentPadding = PaddingValues(horizontal = 8.dp)
+                        ) {
+                            val daysToShow = maxOf(data.totalDays, 7)
+                            val currentActiveDay = if (data.activeDay == 0) 1 else data.activeDay
+
+                            itemsIndexed((1..daysToShow).toList()) { index, dayNumber ->
+                                val dayState = when {
+                                    dayNumber < currentActiveDay -> DayState.Completed
+                                    dayNumber == currentActiveDay -> DayState.Active
+                                    else -> DayState.Upcoming
+                                }
+
+                                AnimatedVisibility(
+                                    visible = isVisible,
+                                    enter = scaleIn(
+                                        animationSpec = tween(
+                                            durationMillis = 400,
+                                            delayMillis = minOf(800 + index * 50, 2000)
+                                        ),
+                                        initialScale = 0.5f
+                                    ) + fadeIn(
+                                        animationSpec = tween(
+                                            durationMillis = 400,
+                                            delayMillis = minOf(800 + index * 50, 2000)
+                                        )
                                     )
-                                )
-                            ) {
-                                DayStreakItem(
-                                    dayNumber = dayNumber,
-                                    dayState = dayState,
-                                    hasReward = mockStreakData.isTodayClaimAvailable && dayNumber == mockStreakData.activeDay,
-                                    onRewardClick = {
-                                        if (mockStreakData.isTodayClaimAvailable && dayNumber == mockStreakData.activeDay) {
-                                            showRewardDialog = true
+                                ) {
+                                    DayStreakItem(
+                                        dayNumber = dayNumber,
+                                        dayState = dayState,
+                                        hasReward = data.isTodayClaimAvailable && dayNumber == currentActiveDay,
+                                        onRewardClick = {
+                                            if (data.isTodayClaimAvailable && dayNumber == currentActiveDay) {
+                                                viewModel.showRewardDialog()
+                                            }
                                         }
-                                    }
-                                )
+                                    )
+                                }
                             }
                         }
                     }
@@ -172,14 +231,14 @@ fun DailyStreakSection(
         }
     }
 
-    if (showRewardDialog) {
+    // Показуємо діалог нагороди
+    if (uiState.showRewardDialog && streakData != null) {
         RewardDialog(
-            day = mockStreakData.activeDay,
-            amount = mockStreakData.todayRewardAmount,
-            onDismiss = { showRewardDialog = false },
+            day = streakData.activeDay,
+            amount = streakData.todayRewardAmount,
+            onDismiss = { viewModel.hideRewardDialog() },
             onClaim = { coins ->
-                // TODO: When ViewModel is ready, call viewModel.claimReward()
-                showRewardDialog = false
+                viewModel.claimStreak()
             }
         )
     }
@@ -226,10 +285,4 @@ private fun RewardNotification(
             )
         }
     }
-}
-
-@Preview
-@Composable
-private fun DailyStreakSectionPreview() {
-    DailyStreakSection()
 }
