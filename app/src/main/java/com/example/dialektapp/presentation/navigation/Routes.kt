@@ -41,6 +41,7 @@ sealed class Routes {
 
     @Serializable
     data class Activity(
+        val lessonId: String,
         val activityId: String,
     ) : Routes()
 }

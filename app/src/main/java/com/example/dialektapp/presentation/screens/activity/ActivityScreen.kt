@@ -35,6 +35,7 @@ data class ActivityUiState(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityScreen(
+    lessonId: String,
     activityId: String,
     onBackClick: () -> Unit,
     onActivityComplete: () -> Unit = {},
@@ -47,7 +48,7 @@ fun ActivityScreen(
         ActivityDetail(
             activity = LessonActivity(
                 id = activityId,
-                lessonId = "lesson1",
+                lessonId = lessonId,
                 name = "Вступ до діалекту",
                 type = ActivityType.INTRODUCTION,
                 duration = "5 хв",

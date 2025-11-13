@@ -19,9 +19,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.dialektapp.R
-import com.example.dialektapp.domain.model.Course
-import com.example.dialektapp.domain.model.CourseModule
 import com.example.dialektapp.presentation.screens.course.components.*
 import com.example.dialektapp.ui.theme.*
 
@@ -33,13 +32,6 @@ private fun getCourseBackgroundImage(courseId: String): Int = when (courseId) {
     else -> R.drawable.background
 }
 
-// Тимчасовий UI State до підключення ViewModel
-data class CourseDetailState(
-    val course: Course? = null,
-    val isLoading: Boolean = false,
-    val error: Throwable? = null,
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CourseDetailScreen(
@@ -47,66 +39,10 @@ fun CourseDetailScreen(
     courseName: String,
     onBackClick: () -> Unit,
     onModuleClick: (String) -> Unit,
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    viewModel: CourseDetailViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-    var expandedModuleId by remember { mutableStateOf("") }
-
-    // Тимчасові mock дані
-    val mockCourse = remember(courseId) {
-        Course(
-            id = courseId,
-            name = courseName,
-            description = "Опис курсу",
-            imageUrl = "",
-            imageUrlBack = "",
-            totalModules = 3,
-            completedModules = 0,
-            modules = listOf(
-                CourseModule(
-                    id = "module1",
-                    courseId = courseId,
-                    title = "Модуль 1",
-                    subtitle = "Вітання та знайомство",
-                    description = "Базові фрази для вітання",
-                    isUnlocked = true,
-                    isCompleted = false,
-                    progress = 0,
-                    lessons = emptyList()
-                ),
-                CourseModule(
-                    id = "module2",
-                    courseId = courseId,
-                    title = "Модуль 2",
-                    subtitle = "Розмова про погоду",
-                    description = "Вивчення погодних термінів",
-                    isUnlocked = false,
-                    isCompleted = false,
-                    progress = 0,
-                    lessons = emptyList()
-                ),
-                CourseModule(
-                    id = "module3",
-                    courseId = courseId,
-                    title = "Модуль 3",
-                    subtitle = "У магазині",
-                    description = "Практичні фрази для покупок",
-                    isUnlocked = false,
-                    isCompleted = false,
-                    progress = 0,
-                    lessons = emptyList()
-                )
-            )
-        )
-    }
-
-    val state = CourseDetailState(
-        course = mockCourse,
-        isLoading = false,
-        error = null
-    )
-
-    val modules = state.course?.modules ?: emptyList()
+    val uiState by viewModel.uiState.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -134,7 +70,7 @@ fun CourseDetailScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = state.course?.name ?: courseName,
+                            text = uiState.course?.name ?: courseName,
                             color = TextPrimaryDark,
                             fontWeight = FontWeight.Bold
                         )
@@ -157,41 +93,69 @@ fun CourseDetailScreen(
             containerColor = Color.Transparent
         ) { paddingValues ->
             Box(modifier = Modifier.fillMaxSize()) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(horizontal = 20.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    item {
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-
-                    itemsIndexed(modules) { index, module ->
-                        ModuleCard(
-                            module = module,
-                            isExpanded = expandedModuleId == module.id,
-                            onCardClick = {
-                                expandedModuleId =
-                                    if (expandedModuleId == module.id) "" else module.id
-                            },
-                            onLessonClick = {
-                                onModuleClick(module.id)
-                            }
+                when {
+                    uiState.isLoading -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                            color = Primary
                         )
                     }
 
-                    item {
-                        Spacer(modifier = Modifier.height(20.dp))
+                    uiState.error != null -> {
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Text(
+                                text = "Помилка завантаження курсу",
+                                color = TextPrimaryDark,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Button(
+                                onClick = { viewModel.retry() },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Primary,
+                                    contentColor = Color.Black
+                                )
+                            ) {
+                                Text("Спробувати знову")
+                            }
+                        }
                     }
-                }
 
-                if (state.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Primary
-                    )
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(paddingValues)
+                                .padding(horizontal = 20.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            item {
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+
+                            itemsIndexed(uiState.modules) { index, module ->
+                                ModuleCard(
+                                    module = module,
+                                    isExpanded = uiState.expandedModuleId == module.id,
+                                    onCardClick = {
+                                        viewModel.toggleModuleExpansion(module.id)
+                                    },
+                                    onLessonClick = {
+                                        onModuleClick(module.id)
+                                    }
+                                )
+                            }
+
+                            item {
+                                Spacer(modifier = Modifier.height(20.dp))
+                            }
+                        }
+                    }
                 }
             }
         }
