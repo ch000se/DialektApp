@@ -1,99 +1,162 @@
 package com.example.dialektapp.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.BottomSheetDefaults.ScrimColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
+
+// Extended colors for custom theme
+data class ExtendedColors(
+    val accentPrimary: Color,
+    val cardBackground: Color,
+    val backgroundGradientStart: Color,
+    val backgroundGradientMiddle: Color,
+    val backgroundGradientEnd: Color,
+    val textGray: Color,
+    val borderDark: Color,
+
+    // Rarity colors
+    val rarityCommon: Color,
+    val rarityRare: Color,
+    val rarityEpic: Color,
+    val rarityLegendary: Color,
+
+    // State colors
+    val stateSuccess: Color,
+    val stateWarning: Color,
+    val stateError: Color,
+    val stateInfo: Color,
+)
+
+private val DarkExtendedColors = ExtendedColors(
+    accentPrimary = AccentPrimary,
+    cardBackground = CardBackground,
+    backgroundGradientStart = BackgroundGradientStart,
+    backgroundGradientMiddle = BackgroundGradientMiddle,
+    backgroundGradientEnd = BackgroundGradientEnd,
+    textGray = TextGray,
+    borderDark = BorderDark,
+
+    rarityCommon = RarityCommonBorder,
+    rarityRare = RarityRareBorder,
+    rarityEpic = RarityEpicBorder,
+    rarityLegendary = RarityLegendaryBorder,
+
+    stateSuccess = StateSuccess,
+    stateWarning = StateWarning,
+    stateError = StateError,
+    stateInfo = StateInfo,
+)
+
+private val LightExtendedColors = ExtendedColors(
+    accentPrimary = AccentPrimary,
+    cardBackground = SurfaceLight,
+    backgroundGradientStart = AccentBlue,
+    backgroundGradientMiddle = AccentBlueDark,
+    backgroundGradientEnd = AccentBlueSky,
+    textGray = TextDarkSecondary,
+    borderDark = BorderLight,
+
+    rarityCommon = RarityCommonBorder,
+    rarityRare = RarityRareBorder,
+    rarityEpic = RarityEpicBorder,
+    rarityLegendary = RarityLegendaryBorder,
+
+    stateSuccess = StateSuccess,
+    stateWarning = StateWarning,
+    stateError = StateError,
+    stateInfo = StateInfo,
+)
+
+val LocalExtendedColors = compositionLocalOf { DarkExtendedColors }
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Primary,
-    onPrimary = Color.White,
-    primaryContainer = PrimaryDark,
-    onPrimaryContainer = Color.White,
+    primary = AccentBlue,
+    onPrimary = TextWhite,
+    primaryContainer = AccentBlueDark,
+    onPrimaryContainer = TextWhite,
 
-    secondary = Secondary,
-    onSecondary = Color(0xFF2D2400),
-    secondaryContainer = SecondaryDark,
-    onSecondaryContainer = Color.White,
+    secondary = AccentPrimary,
+    onSecondary = Color.Black,
+    secondaryContainer = AccentPrimaryDark,
+    onSecondaryContainer = Color.Black,
 
-    tertiary = Accent,
-    onTertiary = Color.White,
-    tertiaryContainer = AccentDark,
-    onTertiaryContainer = Color.White,
+    tertiary = AccentPurple,
+    onTertiary = TextWhite,
+    tertiaryContainer = AccentPurpleDark,
+    onTertiaryContainer = TextWhite,
 
     background = BackgroundDark,
-    onBackground = TextPrimaryDark,
+    onBackground = TextWhite,
 
-    surface = SurfaceDark,
-    onSurface = TextPrimaryDark,
-    surfaceVariant = SurfaceVariantDark,
-    onSurfaceVariant = TextSecondaryDark,
+    surface = CardBackground,
+    onSurface = TextWhite,
+    surfaceVariant = SurfaceDark,
+    onSurfaceVariant = TextGray,
 
-    outline = BorderColorDark,
-    outlineVariant = DividerColorDark,
+    outline = BorderDark,
+    outlineVariant = DividerDark,
 
-    error = Error,
-    onError = Color.White,
-    errorContainer = Color(0xFF640F0A),
-    onErrorContainer = Color(0xFFFFEDEA),
+    error = AccentRed,
+    onError = TextWhite,
+    errorContainer = AccentRedDark,
+    onErrorContainer = TextWhite,
 
-    inverseSurface = Surface,
-    inverseOnSurface = TextPrimary,
-    inversePrimary = Primary,
+    inverseSurface = SurfaceLight,
+    inverseOnSurface = TextDark,
+    inversePrimary = AccentBlue,
 
-    scrim = ScrimColor,
-    surfaceTint = Primary
+    scrim = ScrimDark,
+    surfaceTint = AccentBlue
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Primary,
-    onPrimary = Color.White,
-    primaryContainer = PrimaryLight,
-    onPrimaryContainer = Color(0xFF002F5E),
+    primary = AccentBlue,
+    onPrimary = TextWhite,
+    primaryContainer = AccentBlueLight,
+    onPrimaryContainer = TextDark,
 
-    secondary = Secondary,
-    onSecondary = Color(0xFF2D2400),
-    secondaryContainer = SecondaryLight,
-    onSecondaryContainer = Color(0xFF2D2400),
+    secondary = AccentPrimary,
+    onSecondary = Color.Black,
+    secondaryContainer = AccentPrimaryLight,
+    onSecondaryContainer = Color.Black,
 
-    tertiary = Accent,
-    onTertiary = Color.White,
-    tertiaryContainer = AccentLight,
-    onTertiaryContainer = Color(0xFF450600),
+    tertiary = AccentPurple,
+    onTertiary = TextWhite,
+    tertiaryContainer = AccentPurpleLight,
+    onTertiaryContainer = TextDark,
 
-    background = Background,
-    onBackground = TextPrimary,
+    background = SurfaceLight,
+    onBackground = TextDark,
 
-    surface = Surface,
-    onSurface = TextPrimary,
+    surface = SurfaceLight,
+    onSurface = TextDark,
     surfaceVariant = SurfaceVariant,
-    onSurfaceVariant = TextSecondary,
+    onSurfaceVariant = TextDarkSecondary,
 
-    outline = BorderColor,
-    outlineVariant = DividerColor,
+    outline = BorderLight,
+    outlineVariant = DividerLight,
 
-    error = Error,
-    onError = Color.White,
-    errorContainer = Color(0xFFFFE1DE),
-    onErrorContainer = Color(0xFF5F140E),
+    error = AccentRed,
+    onError = TextWhite,
+    errorContainer = AccentRedLight,
+    onErrorContainer = TextDark,
 
-    inverseSurface = Color(0xFF1D2732),
-    inverseOnSurface = Color(0xFFF1F4F7),
-    inversePrimary = PrimaryLight,
+    inverseSurface = CardBackground,
+    inverseOnSurface = TextWhite,
+    inversePrimary = AccentBlueLight,
 
-    scrim = ScrimColor,
-    surfaceTint = Primary
+    scrim = ScrimDark,
+    surfaceTint = AccentBlue
 )
 
 @Composable
@@ -113,22 +176,34 @@ fun DialektAppTheme(
         else -> LightColorScheme
     }
 
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor = if (darkTheme) {
-                BackgroundDark.toArgb()
-            } else {
-                Primary.toArgb()
-            }
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
-        }
-    }
+    val extendedColors = if (darkTheme) DarkExtendedColors else LightExtendedColors
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    androidx.compose.runtime.CompositionLocalProvider(
+        LocalExtendedColors provides extendedColors
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content
+        )
+    }
 }
+
+// Extension properties to access theme colors easily
+object AppTheme {
+    val colors: ExtendedColors
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalExtendedColors.current
+
+    val materialColors
+        @Composable
+        @ReadOnlyComposable
+        get() = MaterialTheme.colorScheme
+}
+
+// Helper extension for MaterialTheme
+val MaterialTheme.extendedColors: ExtendedColors
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalExtendedColors.current

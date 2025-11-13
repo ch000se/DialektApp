@@ -5,7 +5,7 @@ import com.example.dialektapp.domain.model.User
 
 fun UserDto.toDomain(): User {
     return User(
-        id = username,
+        id = id.toString(),
         username = username,
         email = email,
         fullName = fullName,

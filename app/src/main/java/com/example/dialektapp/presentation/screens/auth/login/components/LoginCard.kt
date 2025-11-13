@@ -24,6 +24,7 @@ import com.example.dialektapp.presentation.screens.auth.components.PasswordField
 import com.example.dialektapp.presentation.screens.auth.login.components.RememberAndForgot
 import com.example.dialektapp.presentation.screens.auth.login.components.SignUpLink
 import com.example.dialektapp.presentation.screens.auth.signup.components.UserNameField
+import com.example.dialektapp.ui.theme.AuthBackgroundWhite
 import com.example.dialektapp.ui.theme.TextPrimary
 import com.example.dialektapp.ui.theme.TextSecondary
 
@@ -50,7 +51,7 @@ fun LoginCard(
             .padding(all = 32.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = AuthBackgroundWhite
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 12.dp

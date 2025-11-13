@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dialektapp.R
+import com.example.dialektapp.ui.theme.AuthContentWhite
 
 
 @Composable
@@ -51,7 +52,7 @@ fun TopLoginScreen(
             text = "ГОВІР+",
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = AuthContentWhite,
             fontSize = 32.sp
         )
 
@@ -60,7 +61,7 @@ fun TopLoginScreen(
         Text(
             text = "Вивчай український діалект легко та просто",
             style = MaterialTheme.typography.bodyLarge,
-            color = Color.White.copy(alpha = 0.8f),
+            color = AuthContentWhite.copy(alpha = 0.8f),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 32.dp)
         )
