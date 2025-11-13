@@ -1,11 +1,19 @@
 # IntelliJ / Android Studio
 *.iml
-.idea/*
+.idea/
 !.idea/codeStyles
 !.idea/runConfigurations
 
 # Local configuration
 local.properties
+
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Kotlin
+.kotlin/
 
 # OS
 .DS_Store
@@ -20,3 +28,8 @@ captures/
 
 # Generated
 .gen/
+
+# Release files
+*.apk
+*.aab
+*.ap_
