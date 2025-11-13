@@ -1,6 +1,7 @@
 package com.example.dialektapp.di
 
 import android.content.Context
+import com.example.dialektapp.data.remote.ActivitiesApi
 import com.example.dialektapp.data.remote.AuthApi
 import com.example.dialektapp.data.remote.CoursesApi
 import com.example.dialektapp.data.remote.TokenInterceptor
@@ -62,4 +63,9 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideCoursesApi(retrofit: Retrofit): CoursesApi = retrofit.create(CoursesApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideActivitiesApi(retrofit: Retrofit): ActivitiesApi =
+        retrofit.create(ActivitiesApi::class.java)
 }
