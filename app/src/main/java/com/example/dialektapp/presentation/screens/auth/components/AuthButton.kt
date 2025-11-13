@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dialektapp.ui.theme.AuthContentWhite
 import com.example.dialektapp.ui.theme.Primary
 
 @Composable
@@ -53,9 +54,9 @@ fun AuthButton(
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = Primary,
-            contentColor = Color.White,
+            contentColor = AuthContentWhite,
             disabledContainerColor = Primary.copy(alpha = 0.6f),
-            disabledContentColor = Color.White.copy(alpha = 0.6f)
+            disabledContentColor = AuthContentWhite.copy(alpha = 0.6f)
         ),
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 6.dp,
@@ -73,7 +74,7 @@ fun AuthButton(
             CircularProgressIndicator(
                 modifier = Modifier.size(16.dp),
                 strokeWidth = 2.dp,
-                color = Color.White
+                color = AuthContentWhite
             )
         }
     }

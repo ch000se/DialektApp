@@ -3,6 +3,8 @@ package com.example.dialektapp.data.remote.dto
 import com.google.gson.annotations.SerializedName
 
 data class UserDto(
+    @SerializedName("id")
+    val id: Int,
     @SerializedName("username")
     val username: String,
     @SerializedName("email")

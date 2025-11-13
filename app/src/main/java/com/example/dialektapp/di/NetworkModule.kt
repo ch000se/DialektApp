@@ -2,6 +2,7 @@ package com.example.dialektapp.di
 
 import android.content.Context
 import com.example.dialektapp.data.remote.AuthApi
+import com.example.dialektapp.data.remote.CoursesApi
 import com.example.dialektapp.data.remote.TokenInterceptor
 import com.example.dialektapp.data.remote.TokenManager
 import dagger.Module
@@ -18,6 +19,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
+    private const val BASE_URL = "http://10.0.2.2:9090/"
 
     @Provides
     @Singleton
@@ -46,7 +49,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://chad-dialect-server.onrender.com")
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
@@ -55,4 +58,8 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideAuthApi(retrofit: Retrofit): AuthApi = retrofit.create(AuthApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideCoursesApi(retrofit: Retrofit): CoursesApi = retrofit.create(CoursesApi::class.java)
 }

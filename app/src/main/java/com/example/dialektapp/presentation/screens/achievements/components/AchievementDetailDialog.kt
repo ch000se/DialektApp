@@ -1,0 +1,325 @@
+package com.example.dialektapp.presentation.screens.achievements.components
+
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.example.dialektapp.domain.model.Achievement
+import com.example.dialektapp.domain.model.AchievementRarity
+
+@Composable
+fun AchievementDetailDialog(
+    achievement: Achievement,
+    onDismiss: () -> Unit,
+    onActionClick: (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "glow")
+    val glowAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 0.7f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glow"
+    )
+
+    val scale by animateFloatAsState(
+        targetValue = if (achievement.isUnlocked) 1f else 0.95f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "scale"
+    )
+
+    val gradientColors = getDialogGradient(achievement.rarity, achievement.isUnlocked)
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = gradientColors
+                    )
+                )
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .statusBarsPadding(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FilledIconButton(
+                        onClick = onDismiss,
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.25f)
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Назад",
+                            tint = Color.White
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Text(
+                        text = "Деталі досягнення",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(40.dp))
+
+                    Box(
+                        modifier = Modifier.size(180.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        // Animated glow for unlocked achievements
+                        if (achievement.isUnlocked) {
+                            Box(
+                                modifier = Modifier
+                                    .size(180.dp)
+                                    .scale(1.2f)
+                                    .background(
+                                        brush = Brush.radialGradient(
+                                            colors = listOf(
+                                                Color.White.copy(alpha = glowAlpha),
+                                                Color.Transparent
+                                            )
+                                        ),
+                                        shape = CircleShape
+                                    )
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .size(160.dp)
+                                .scale(scale)
+                                .background(
+                                    brush = Brush.radialGradient(
+                                        colors = if (achievement.isUnlocked) {
+                                            listOf(
+                                                Color.White,
+                                                Color(0xFFF5F5F5)
+                                            )
+                                        } else {
+                                            listOf(
+                                                Color(0xFF616161),
+                                                Color(0xFF757575)
+                                            )
+                                        }
+                                    ),
+                                    shape = CircleShape
+                                )
+                                .border(
+                                    width = 6.dp,
+                                    brush = if (achievement.isUnlocked) {
+                                        Brush.linearGradient(
+                                            colors = getRarityColors(achievement.rarity)
+                                        )
+                                    } else {
+                                        Brush.linearGradient(
+                                            colors = listOf(Color(0xFF9E9E9E), Color(0xFFBDBDBD))
+                                        )
+                                    },
+                                    shape = CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = if (achievement.isUnlocked) {
+                                    achievement.iconUrl ?: "🏆"
+                                } else {
+                                    "🔒"
+                                },
+                                fontSize = 72.sp
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    if (achievement.isUnlocked) {
+                        RarityChip(rarity = achievement.rarity)
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    Text(
+                        text = achievement.title,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White.copy(alpha = 0.2f)
+                        ),
+                        shape = RoundedCornerShape(20.dp)
+                    ) {
+                        Text(
+                            text = achievement.description,
+                            fontSize = 16.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 24.sp,
+                            modifier = Modifier.padding(24.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    if (achievement.isUnlocked && onActionClick != null) {
+                        Button(
+                            onClick = onActionClick,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(64.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFFD1F501)
+                            ),
+                            shape = RoundedCornerShape(32.dp),
+                            elevation = ButtonDefaults.buttonElevation(
+                                defaultElevation = 8.dp,
+                                pressedElevation = 12.dp
+                            )
+                        ) {
+                            Text(
+                                text = "ПРОДОВЖИТИ",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RarityChip(rarity: AchievementRarity) {
+    val (text, colors) = when (rarity) {
+        AchievementRarity.COMMON -> "ЗВИЧАЙНЕ" to listOf(Color(0xFF66BB6A), Color(0xFF81C784))
+        AchievementRarity.RARE -> "РІДКІСНЕ" to listOf(Color(0xFF42A5F5), Color(0xFF64B5F6))
+        AchievementRarity.EPIC -> "ЕПІЧНЕ" to listOf(Color(0xFFAB47BC), Color(0xFFBA68C8))
+        AchievementRarity.LEGENDARY -> "ЛЕГЕНДАРНЕ" to listOf(Color(0xFFFFB74D), Color(0xFFFFA726))
+    }
+
+    Surface(
+        color = Color.Transparent,
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.border(
+            width = 2.dp,
+            brush = Brush.linearGradient(colors),
+            shape = RoundedCornerShape(16.dp)
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = colors.map { it.copy(alpha = 0.3f) }
+                    )
+                )
+                .padding(horizontal = 20.dp, vertical = 8.dp)
+        ) {
+            Text(
+                text = text,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+        }
+    }
+}
+
+private fun getDialogGradient(rarity: AchievementRarity, isUnlocked: Boolean): List<Color> {
+    if (!isUnlocked) {
+        return listOf(
+            Color(0xFF424242),
+            Color(0xFF616161),
+            Color(0xFF757575)
+        )
+    }
+
+    return when (rarity) {
+        AchievementRarity.COMMON -> listOf(
+            Color(0xFF388E3C),
+            Color(0xFF4CAF50),
+            Color(0xFF66BB6A)
+        )
+
+        AchievementRarity.RARE -> listOf(
+            Color(0xFF1976D2),
+            Color(0xFF2196F3),
+            Color(0xFF42A5F5)
+        )
+
+        AchievementRarity.EPIC -> listOf(
+            Color(0xFF7B1FA2),
+            Color(0xFF9C27B0),
+            Color(0xFFAB47BC)
+        )
+
+        AchievementRarity.LEGENDARY -> listOf(
+            Color(0xFFF57C00),
+            Color(0xFFFF9800),
+            Color(0xFFFFB74D)
+        )
+    }
+}
+
+private fun getRarityColors(rarity: AchievementRarity): List<Color> {
+    return when (rarity) {
+        AchievementRarity.COMMON -> listOf(Color(0xFF66BB6A), Color(0xFF81C784))
+        AchievementRarity.RARE -> listOf(Color(0xFF42A5F5), Color(0xFF64B5F6))
+        AchievementRarity.EPIC -> listOf(Color(0xFFAB47BC), Color(0xFFBA68C8))
+        AchievementRarity.LEGENDARY -> listOf(Color(0xFFFFB74D), Color(0xFFFFA726))
+    }
+}

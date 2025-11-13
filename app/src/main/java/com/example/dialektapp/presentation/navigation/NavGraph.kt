@@ -32,7 +32,7 @@ fun NavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = Routes.Home,
+        startDestination = Routes.Auth,
         enterTransition = {
             slideInHorizontally(
                 animationSpec = tween(400),
