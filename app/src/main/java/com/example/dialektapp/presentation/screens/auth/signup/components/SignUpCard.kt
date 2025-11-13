@@ -21,6 +21,7 @@ import com.example.dialektapp.domain.util.ValidationError
 import com.example.dialektapp.presentation.screens.auth.components.AuthButton
 import com.example.dialektapp.presentation.screens.auth.components.EmailField
 import com.example.dialektapp.presentation.screens.auth.components.PasswordField
+import com.example.dialektapp.ui.theme.AuthBackgroundWhite
 import com.example.dialektapp.ui.theme.TextPrimary
 import com.example.dialektapp.ui.theme.TextSecondary
 
@@ -53,7 +54,7 @@ fun SignUpCard(
             .padding(horizontal = 24.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = AuthBackgroundWhite
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 12.dp
@@ -66,7 +67,7 @@ fun SignUpCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Створити аккаунт",
+                text = "Створити акаунт",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = TextPrimary,

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,26 +36,33 @@ import com.example.dialektapp.ui.theme.GradientStart
 @Composable
 fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
+    snackbarHostState: SnackbarHostState,
     onSignInClick: () -> Unit = {},
     onSignUpSuccess: (String, String) -> Unit,
 ) {
     val context = LocalContext.current
     val state by viewModel.signUpState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(key1 = Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
-                        message = event.message.toUserMessage(context),
+                        message = event.message,
+                        actionLabel = event.actionLabel
+                    )
+                }
+
+                is UiEvent.ShowErrorSnackbar -> {
+                    snackbarHostState.showSnackbar(
+                        message = event.error.toUserMessage(context),
                         actionLabel = event.actionLabel
                     )
                 }
 
                 UiEvent.Navigate -> {
                     onSignUpSuccess(
-                        state.email,
+                        state.username,
                         state.password
                     )
                 }
@@ -67,7 +75,8 @@ fun SignUpScreen(
             TopAuthBar(text = "Створити акаунт", onBackClick = onSignInClick)
         },
         containerColor = GradientStart,
-        contentWindowInsets = WindowInsets(bottom = 0)
+        contentWindowInsets = WindowInsets(bottom = 0),
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
 
         Column(
@@ -114,7 +123,8 @@ fun SignUpScreenPreview() {
         SignUpScreen(
             viewModel = TODO(),
             onSignInClick = {},
-            onSignUpSuccess = { _, _ -> }
+            onSignUpSuccess = { _, _ -> },
+            snackbarHostState = SnackbarHostState()
         )
     }
 }

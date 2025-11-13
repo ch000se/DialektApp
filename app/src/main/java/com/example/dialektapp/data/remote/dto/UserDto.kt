@@ -9,8 +9,10 @@ data class UserDto(
     val email: String,
     @SerializedName("full_name")
     val fullName: String,
+    @SerializedName("profile_image_url")
+    val profileImageUrl: String?,
     @SerializedName("disabled")
     val disabled: Boolean,
     @SerializedName("role")
-    val role: String
+    val role: String,
 )

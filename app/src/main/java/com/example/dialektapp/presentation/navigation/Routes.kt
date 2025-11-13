@@ -16,5 +16,31 @@ sealed class Routes {
     data object ForgotPassword : Routes()
 
     @Serializable
+    data object Home : Routes()
+
+    @Serializable
     data object Profile : Routes()
+
+    @Serializable
+    data object Leaderboard : Routes()
+
+    @Serializable
+    data object Achievements : Routes()
+
+    @Serializable
+    data class CourseDetail(
+        val courseId: String,
+        val courseName: String,
+    ) : Routes()
+
+    @Serializable
+    data class ModuleLessons(
+        val moduleId: String,
+        val moduleTitle: String,
+    ) : Routes()
+
+    @Serializable
+    data class Activity(
+        val activityId: String,
+    ) : Routes()
 }

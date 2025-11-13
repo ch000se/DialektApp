@@ -90,4 +90,7 @@ dependencies {
 
     // For security
     implementation("androidx.security:security-crypto:1.1.0-alpha03")
+
+    // Splash API
+    implementation("androidx.core:core-splashscreen:1.0.1")
 }

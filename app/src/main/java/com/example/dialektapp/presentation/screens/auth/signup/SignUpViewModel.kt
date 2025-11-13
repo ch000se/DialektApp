@@ -124,12 +124,13 @@ class SignUpViewModel @Inject constructor(
 
             result.onSuccess {
                 _signUpState.value = _signUpState.value.copy(isSuccess = true)
+                _uiEvent.emit(UiEvent.ShowSnackbar("Реєстрація успішна! Тепер ви можете увійти"))
                 _uiEvent.emit(UiEvent.Navigate)
             }.onError { error ->
                 _signUpState.value = _signUpState.value.copy(
                     errorMessageSignUpProcess = error
                 )
-                _uiEvent.emit(UiEvent.ShowSnackbar(error))
+                _uiEvent.emit(UiEvent.ShowErrorSnackbar(error))
             }
         }
     }

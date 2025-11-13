@@ -5,14 +5,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -35,11 +41,16 @@ import com.example.dialektapp.ui.theme.GradientEnd
 import com.example.dialektapp.ui.theme.GradientMiddle
 import com.example.dialektapp.ui.theme.GradientStart
 import com.example.dialektapp.ui.theme.Primary
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues,
+    snackbarHostState: SnackbarHostState,
+    prefilledUsername: String = "",
+    prefilledPassword: String = "",
     viewModel: LoginViewModel = hiltViewModel(),
     onSignUpClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
@@ -47,14 +58,29 @@ fun LoginScreen(
 ) {
     val context = LocalContext.current
     val state = viewModel.loginState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(prefilledUsername, prefilledPassword) {
+        if (prefilledUsername.isNotEmpty()) {
+            viewModel.updateUsername(prefilledUsername)
+        }
+        if (prefilledPassword.isNotEmpty()) {
+            viewModel.updatePassword(prefilledPassword)
+        }
+    }
+
+    LaunchedEffect(key1 = Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
-                        message = event.message.toUserMessage(context),
+                        message = event.message,
+                        actionLabel = event.actionLabel,
+                    )
+                }
+
+                is UiEvent.ShowErrorSnackbar -> {
+                    snackbarHostState.showSnackbar(
+                        message = event.error.toUserMessage(context),
                         actionLabel = event.actionLabel
                     )
                 }
@@ -71,7 +97,8 @@ fun LoginScreen(
             .fillMaxSize()
             .background(
                 color = BackColor
-            ),
+            )
+            .padding(contentPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -107,7 +134,10 @@ private fun LoginScreenPreview() {
         viewModel = hiltViewModel(),
         onSignUpClick = {},
         onForgotPasswordClick = {},
-        onSignInSuccess = {}
-
+        onSignInSuccess = {},
+        prefilledUsername = "",
+        prefilledPassword = "",
+        snackbarHostState = SnackbarHostState(),
+        contentPadding = PaddingValues()
     )
 }

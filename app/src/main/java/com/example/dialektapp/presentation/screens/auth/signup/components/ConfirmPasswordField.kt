@@ -27,9 +27,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.dialektapp.domain.util.ValidationError
 import com.example.dialektapp.presentation.util.toUserMessage
+import com.example.dialektapp.ui.theme.AuthErrorRed
 import com.example.dialektapp.ui.theme.BorderColor
 import com.example.dialektapp.ui.theme.Primary
-import com.example.dialektapp.ui.theme.TextPrimary
 import com.example.dialektapp.ui.theme.TextSecondary
 
 @Composable
@@ -50,12 +50,12 @@ fun ConfirmPasswordField(
             modifier = Modifier.fillMaxWidth(),
             value = confirmPassword,
             onValueChange = onConfirmPasswordChange,
-            label = { Text("Confirm Password") },
+            label = { Text("Підтвердіть пароль") },
             leadingIcon = {
                 Icon(
                     Icons.Filled.Lock,
-                    contentDescription = "Confirm Password",
-                    tint = if (firstConfirmPasswordError != null) Color.Red else TextSecondary
+                    contentDescription = "Підтвердіть пароль",
+                    tint = if (firstConfirmPasswordError != null) AuthErrorRed else TextSecondary
                 )
             },
             trailingIcon = {
@@ -67,7 +67,7 @@ fun ConfirmPasswordField(
                 ) {
                     Icon(
                         imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                        contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                        contentDescription = if (passwordVisible) "Сховати пароль" else "Показати пароль"
                     )
                 }
             },
@@ -79,30 +79,30 @@ fun ConfirmPasswordField(
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = if (firstConfirmPasswordError != null) Color.Red else Primary,
-                unfocusedBorderColor = if (firstConfirmPasswordError != null) Color.Red else BorderColor,
-                focusedLabelColor = if (firstConfirmPasswordError != null) Color.Red else Primary,
-                unfocusedLabelColor = if (firstConfirmPasswordError != null) Color.Red else TextSecondary,
-                focusedTextColor = if (firstConfirmPasswordError != null) Color.Red else Primary,
-                unfocusedTextColor = if (firstConfirmPasswordError != null) Color.Red else TextSecondary,
-                focusedLeadingIconColor = if (firstConfirmPasswordError != null) Color.Red else Primary,
-                unfocusedLeadingIconColor = if (firstConfirmPasswordError != null) Color.Red else TextSecondary,
-                errorBorderColor = Color.Red,
-                errorLabelColor = Color.Red,
-                errorLeadingIconColor = Color.Red,
-                errorTextColor = Color.Red,
-                errorCursorColor = Color.Red,
-                errorTrailingIconColor = Color.Red,
+                focusedBorderColor = if (firstConfirmPasswordError != null) AuthErrorRed else Primary,
+                unfocusedBorderColor = if (firstConfirmPasswordError != null) AuthErrorRed else BorderColor,
+                focusedLabelColor = if (firstConfirmPasswordError != null) AuthErrorRed else Primary,
+                unfocusedLabelColor = if (firstConfirmPasswordError != null) AuthErrorRed else TextSecondary,
+                focusedTextColor = if (firstConfirmPasswordError != null) AuthErrorRed else Primary,
+                unfocusedTextColor = if (firstConfirmPasswordError != null) AuthErrorRed else TextSecondary,
+                focusedLeadingIconColor = if (firstConfirmPasswordError != null) AuthErrorRed else Primary,
+                unfocusedLeadingIconColor = if (firstConfirmPasswordError != null) AuthErrorRed else TextSecondary,
+                errorBorderColor = AuthErrorRed,
+                errorLabelColor = AuthErrorRed,
+                errorLeadingIconColor = AuthErrorRed,
+                errorTextColor = AuthErrorRed,
+                errorCursorColor = AuthErrorRed,
+                errorTrailingIconColor = AuthErrorRed,
             )
         )
 
         if (firstConfirmPasswordError != null) {
             Text(
                 text = firstConfirmPasswordError.toUserMessage(context),
-                color = Color.Red,
+                color = AuthErrorRed,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(start = 16.dp, top = 4.dp),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Start
             )
         }
     }

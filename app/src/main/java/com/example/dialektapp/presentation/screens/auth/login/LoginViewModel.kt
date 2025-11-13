@@ -28,7 +28,10 @@ class LoginViewModel @Inject constructor(
     private val validateLogin: ValidateLoginUseCase,
 ) : ViewModel() {
 
-    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    private val _uiEvent = MutableSharedFlow<UiEvent>(
+        replay = 0,
+        extraBufferCapacity = 1,
+    )
     val uiEvent = _uiEvent.asSharedFlow()
 
     private val _loginState = MutableStateFlow(LoginState())
@@ -100,6 +103,7 @@ class LoginViewModel @Inject constructor(
                 .onSuccess { user ->
                     _loginState.value = _loginState.value.copy(isLoading = false)
                     Log.d("LoginViewModel", "Login successful: $user")
+                    _uiEvent.emit(UiEvent.ShowSnackbar("Вхід успішний! Ласкаво просимо!"))
                     _uiEvent.emit(UiEvent.Navigate)
                 }
                 .onError { error ->
@@ -110,7 +114,7 @@ class LoginViewModel @Inject constructor(
                     Log.d("LoginViewModel", "Login error: $error")
 
                     _uiEvent.emit(
-                        UiEvent.ShowSnackbar(error)
+                        UiEvent.ShowErrorSnackbar(error)
                     )
                 }
         }
