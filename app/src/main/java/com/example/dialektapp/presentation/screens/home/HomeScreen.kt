@@ -67,7 +67,7 @@ fun HomeScreen(
                     coinsCount = stats.totalCoins
                 )
 
-                DailyStreakSection()
+                DailyStreakSection(viewModel = viewModel)
             }
         }
 
