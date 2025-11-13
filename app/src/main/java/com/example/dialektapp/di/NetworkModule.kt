@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.dialektapp.data.remote.ActivitiesApi
 import com.example.dialektapp.data.remote.AuthApi
 import com.example.dialektapp.data.remote.CoursesApi
+import com.example.dialektapp.data.remote.LeaderboardApi
 import com.example.dialektapp.data.remote.StreakApi
 import com.example.dialektapp.data.remote.TokenInterceptor
 import com.example.dialektapp.data.remote.TokenManager
@@ -74,4 +75,9 @@ object NetworkModule {
     @Singleton
     fun provideStreakApi(retrofit: Retrofit): StreakApi =
         retrofit.create(StreakApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideLeaderboardApi(retrofit: Retrofit): LeaderboardApi =
+        retrofit.create(LeaderboardApi::class.java)
 }
