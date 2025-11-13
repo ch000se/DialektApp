@@ -1,6 +1,5 @@
 package com.example.dialektapp.data.repository
 
-import android.util.Log
 import com.example.dialektapp.data.mappers.toDomain
 import com.example.dialektapp.data.remote.AuthApi
 import com.example.dialektapp.data.remote.TokenManager

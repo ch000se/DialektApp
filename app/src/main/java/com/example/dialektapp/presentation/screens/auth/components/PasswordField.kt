@@ -1,6 +1,8 @@
 package com.example.dialektapp.presentation.screens.auth.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -16,7 +18,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.dialektapp.domain.util.ValidationError
 import com.example.dialektapp.presentation.util.toUserMessage
+import com.example.dialektapp.ui.theme.AuthErrorRed
 import com.example.dialektapp.ui.theme.BorderColor
 import com.example.dialektapp.ui.theme.Primary
 import com.example.dialektapp.ui.theme.TextSecondary
@@ -48,58 +50,61 @@ fun PasswordField(
                 it is ValidationError.PasswordMissingSpecialChar
     }
 
-    OutlinedTextField(
-        modifier = Modifier.fillMaxWidth(),
-        value = password,
-        onValueChange = onPasswordChange,
-        label = { Text("Password") },
-        leadingIcon = {
-            Icon(
-                Icons.Filled.Lock,
-                contentDescription = "Password",
-                tint = if (firstPasswordError != null) Color.Red else TextSecondary
-            )
-        },
-        trailingIcon = {
-            IconButton(
-                onClick = { onPasswordVisibleChange(!passwordVisible) }
-            ) {
+    Column {
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = password,
+            onValueChange = onPasswordChange,
+            label = { Text("Пароль") },
+            leadingIcon = {
                 Icon(
-                    imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                    contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                    tint = if (firstPasswordError != null) Color.Red else TextSecondary
+                    Icons.Filled.Lock,
+                    contentDescription = "Пароль",
+                    tint = if (firstPasswordError != null) AuthErrorRed else TextSecondary
                 )
-            }
-        },
-        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        singleLine = true,
-        isError = firstPasswordError != null,
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = if (firstPasswordError != null) Color.Red else Primary,
-            unfocusedBorderColor = if (firstPasswordError != null) Color.Red else BorderColor,
-            focusedLabelColor = if (firstPasswordError != null) Color.Red else Primary,
-            unfocusedLabelColor = if (firstPasswordError != null) Color.Red else TextSecondary,
-            focusedTextColor = if (firstPasswordError != null) Color.Red else Primary,
-            unfocusedTextColor = if (firstPasswordError != null) Color.Red else TextSecondary,
-            focusedLeadingIconColor = if (firstPasswordError != null) Color.Red else Primary,
-            unfocusedLeadingIconColor = if (firstPasswordError != null) Color.Red else TextSecondary,
-            errorBorderColor = Color.Red,
-            errorLabelColor = Color.Red,
-            errorLeadingIconColor = Color.Red,
-            errorTextColor = Color.Red,
-            errorCursorColor = Color.Red,
-            errorTrailingIconColor = Color.Red,
+            },
+            trailingIcon = {
+                IconButton(
+                    onClick = { onPasswordVisibleChange(!passwordVisible) }
+                ) {
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = if (passwordVisible) "Сховати пароль" else "Показати пароль",
+                        tint = if (firstPasswordError != null) AuthErrorRed else TextSecondary
+                    )
+                }
+            },
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            singleLine = true,
+            isError = firstPasswordError != null,
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = if (firstPasswordError != null) AuthErrorRed else Primary,
+                unfocusedBorderColor = if (firstPasswordError != null) AuthErrorRed else BorderColor,
+                focusedLabelColor = if (firstPasswordError != null) AuthErrorRed else Primary,
+                unfocusedLabelColor = if (firstPasswordError != null) AuthErrorRed else TextSecondary,
+                focusedTextColor = if (firstPasswordError != null) AuthErrorRed else Primary,
+                unfocusedTextColor = if (firstPasswordError != null) AuthErrorRed else TextSecondary,
+                focusedLeadingIconColor = if (firstPasswordError != null) AuthErrorRed else Primary,
+                unfocusedLeadingIconColor = if (firstPasswordError != null) AuthErrorRed else TextSecondary,
+                errorBorderColor = AuthErrorRed,
+                errorLabelColor = AuthErrorRed,
+                errorLeadingIconColor = AuthErrorRed,
+                errorTextColor = AuthErrorRed,
+                errorCursorColor = AuthErrorRed,
+                errorTrailingIconColor = AuthErrorRed,
+            )
         )
-    )
 
-    if (firstPasswordError != null) {
-        Text(
-            text = firstPasswordError.toUserMessage(context),
-            color = Color.Red,
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center
-        )
+        if (firstPasswordError != null) {
+            Text(
+                text = firstPasswordError.toUserMessage(context),
+                color = AuthErrorRed,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp),
+                textAlign = TextAlign.Start
+            )
+        }
     }
 }

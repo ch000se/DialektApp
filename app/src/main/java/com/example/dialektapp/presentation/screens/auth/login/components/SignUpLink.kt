@@ -21,7 +21,7 @@ fun SignUpLink(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Don't have an account? ",
+            text = "Не маєте акаунту? ",
             color = TextSecondary,
             style = MaterialTheme.typography.bodyMedium
         )
@@ -29,7 +29,7 @@ fun SignUpLink(
             onClick = onSignUpClick
         ) {
             Text(
-                text = "Sign Up",
+                text = "Зареєструватися",
                 color = Primary,
                 fontWeight = FontWeight.Bold
             )

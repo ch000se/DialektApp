@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.dialektapp.domain.util.ValidationError
 import com.example.dialektapp.presentation.util.toUserMessage
+import com.example.dialektapp.ui.theme.AuthErrorRed
 import com.example.dialektapp.ui.theme.Primary
 import com.example.dialektapp.ui.theme.TextPrimary
 import com.example.dialektapp.ui.theme.TextSecondary
@@ -64,12 +65,12 @@ fun TermsAndConditions(
             horizontalArrangement = Arrangement.Start
         ) {
             Text(
-                text = "I agree to the ",
+                text = "Я погоджуюся з ",
                 style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
             )
 
             Text(
-                text = "Terms of Service",
+                text = "Умовами використання",
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = Primary,
                     fontWeight = FontWeight.Medium,
@@ -79,12 +80,12 @@ fun TermsAndConditions(
             )
 
             Text(
-                text = " and ",
+                text = " та ",
                 style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
             )
 
             Text(
-                text = "Privacy Policy",
+                text = "Політикою конфіденційності",
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = Primary,
                     fontWeight = FontWeight.Medium,
@@ -98,7 +99,7 @@ fun TermsAndConditions(
     if (firstTermsAndConditionsError != null) {
         Text(
             text = firstTermsAndConditionsError.toUserMessage(context),
-            color = Color.Red,
+            color = AuthErrorRed,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(start = 16.dp, top = 4.dp)
         )

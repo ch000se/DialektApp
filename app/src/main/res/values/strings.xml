@@ -1,26 +1,18 @@
 <resources>
-    <string name="app_name">DialektApp</string>
+    <string name="app_name">Говір+</string>
     <string name="no_internet">Немає підключення до інтернету</string>
+    <string name="server_unavailable">Сервер недоступний. Спробуйте пізніше</string>
     <string name="request_timeout">Час очікування вичерпано</string>
     <string name="too_many_requests">Забагато запитів. Спробуйте пізніше</string>
+    <string name="unauthorized">Неправильне ім\'я користувача або пароль</string>
     <string name="unknown">Невідома помилка</string>
 
-    <!-- Auth strings -->
-    <string name="welcome_back">Welcome Back!</string>
-    <string name="sign_in_subtitle">Sign in to continue your learning journey</string>
-    <string name="create_account">Create Account</string>
-    <string name="join_dialekt">Join DialektApp and start your language learning journey</string>
-
     <!-- Form validation -->
-    <string name="username_error">Username must be at least 3 characters</string>
-    <string name="fullname_error">Full name must be at least 2 characters</string>
-    <string name="email_error">Please enter a valid email address</string>
-    <string name="password_error">Password must be at least 8 characters</string>
-    <string name="confirm_password_error">Passwords do not match</string>
     <string name="username_empty">Ім\'я користувача не може бути порожнім</string>
     <string name="username_too_short">Ім\'я користувача занадто коротке</string>
     <string name="username_too_long">Ім\'я користувача занадто довге</string>
     <string name="username_invalid_chars">Ім\'я користувача містить недопустимі символи</string>
+    <string name="username_already_exists">Ім\'я користувача вже використовується</string>
     <string name="fullname_empty">Повне ім\'я не може бути порожнім</string>
     <string name="fullname_too_short">Повне ім\'я занадто коротке</string>
     <string name="fullname_too_long">Повне ім\'я занадто довге</string>
@@ -36,5 +28,10 @@
     <string name="password_miss_special_char">Пароль повинен містити хоча б один спеціальний символ</string>
     <string name="password_dont_match">Паролі не співпадають</string>
     <string name="terms_not_accepted">Ви повинні прийняти умови користування</string>
-    <string name="none_error" />
+    <string name="none_error">Немає помилки</string>
+
+    <!-- Success messages -->
+    <string name="registration_successful">Реєстрація успішна! Тепер ви можете увійти</string>
+    <string name="login_successful">Вхід успішний! Ласкаво просимо!</string>
+    <string name="password_reset_sent">Посилання для скидання пароля надіслано на ваш email</string>
 </resources>

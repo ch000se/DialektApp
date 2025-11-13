@@ -20,4 +20,5 @@ interface AuthRepository {
     suspend fun getCurrentUser(): Result<User, NetworkError>
 
     suspend fun logout()
+
 }

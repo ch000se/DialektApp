@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.example.dialektapp.domain.util.ValidationError
 import com.example.dialektapp.presentation.screens.auth.components.AuthButton
 import com.example.dialektapp.presentation.screens.auth.components.EmailField
+import com.example.dialektapp.ui.theme.AuthBackgroundWhite
 import com.example.dialektapp.ui.theme.TextPrimary
 import com.example.dialektapp.ui.theme.TextSecondary
 
@@ -38,7 +39,7 @@ fun ForgotPasswordCard(
             .padding(all = 32.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = AuthBackgroundWhite
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp
@@ -72,8 +73,8 @@ fun ForgotPasswordCard(
             )
             Spacer(modifier = Modifier.height(24.dp))
             AuthButton(
-                primaryText = "Send Reset Link",
-                secondaryText = "Sending...",
+                primaryText = "Надіслати посилання",
+                secondaryText = "Надсилання...",
                 loadingState = loadingState,
                 enabled = enabled,
                 onAuthClick = onResetPasswordClick

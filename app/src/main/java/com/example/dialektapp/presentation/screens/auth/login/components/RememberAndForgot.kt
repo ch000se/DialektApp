@@ -39,7 +39,7 @@ fun RememberAndForgot(
                 )
             )
             Text(
-                text = "Remember me",
+                text = "Запам'ятати мене",
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextSecondary
             )
@@ -49,7 +49,7 @@ fun RememberAndForgot(
             onClick = onForgotPasswordClick
         ) {
             Text(
-                text = "Forgot Password?",
+                text = "Забули пароль?",
                 color = Primary,
                 fontWeight = FontWeight.Medium
             )

@@ -21,7 +21,6 @@ interface AuthApi {
         @Field ("password") password: String
     ): Response<LoginResponse>
 
-
     @GET("/users/me")
     suspend fun getCurrentUser(): Response<UserDto>
 }
