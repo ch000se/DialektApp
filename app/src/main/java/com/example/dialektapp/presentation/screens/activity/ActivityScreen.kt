@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.dialektapp.domain.model.ActivityContent
 import com.example.dialektapp.domain.model.ActivityDetail
 import com.example.dialektapp.domain.model.ActivityType
@@ -24,14 +25,6 @@ private val BackgroundDark = Color(0xFF15161A)
 private val CardBackground = Color(0xFF1F2025)
 private val TextWhite = Color.White
 
-// Тимчасовий UI State до підключення ViewModel
-data class ActivityUiState(
-    val activityDetail: ActivityDetail? = null,
-    val isLoading: Boolean = false,
-    val error: Throwable? = null,
-    val isCompleted: Boolean = false,
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityScreen(
@@ -39,44 +32,17 @@ fun ActivityScreen(
     activityId: String,
     onBackClick: () -> Unit,
     onActivityComplete: () -> Unit = {},
+    viewModel: ActivityViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    var isCompleted by remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsState()
 
-    // Тимчасові mock дані
-    val mockActivityDetail = remember(activityId) {
-        ActivityDetail(
-            activity = LessonActivity(
-                id = activityId,
-                lessonId = lessonId,
-                name = "Вступ до діалекту",
-                type = ActivityType.INTRODUCTION,
-                duration = "5 хв",
-                order = 1,
-                isCompleted = false,
-                isUnlocked = true
-            ),
-            content = ActivityContent.Introduction(
-                title = "Вітання та знайомство",
-                description = "У цьому уроці ви навчитеся базовим фразам для вітання та знайомства",
-                keyPoints = listOf(
-                    "Базові вітання",
-                    "Представлення себе",
-                    "Вимова та наголоси"
-                )
-            )
-        )
+    LaunchedEffect(activityId) {
+        viewModel.loadActivity(activityId)
     }
 
-    val uiState = ActivityUiState(
-        activityDetail = mockActivityDetail,
-        isLoading = false,
-        error = null,
-        isCompleted = isCompleted
-    )
-
-    LaunchedEffect(isCompleted) {
-        if (isCompleted) {
+    LaunchedEffect(uiState.isCompleted) {
+        if (uiState.isCompleted) {
             onActivityComplete()
         }
     }
@@ -132,12 +98,12 @@ fun ActivityScreen(
                         modifier = Modifier.padding(32.dp)
                     ) {
                         Text(
-                            text = "Помилка завантаження активності",
+                            text = uiState.error ?: "Помилка завантаження активності",
                             color = TextWhite,
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Button(
-                            onClick = { /* retry */ },
+                            onClick = { viewModel.retry() },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFFD1F501),
                                 contentColor = Color.Black
@@ -150,13 +116,13 @@ fun ActivityScreen(
             }
 
             uiState.activityDetail != null -> {
-                val activityDetail = uiState.activityDetail
+                val activityDetail = uiState.activityDetail!!
 
                 when (activityDetail.content) {
                     is ActivityContent.Introduction -> {
                         IntroductionContent(
                             content = activityDetail.content,
-                            onComplete = { isCompleted = true },
+                            onComplete = { viewModel.completeActivity() },
                             modifier = Modifier.padding(paddingValues)
                         )
                     }
@@ -164,7 +130,7 @@ fun ActivityScreen(
                     is ActivityContent.Reading -> {
                         ReadingContent(
                             content = activityDetail.content,
-                            onComplete = { isCompleted = true },
+                            onComplete = { viewModel.completeActivity() },
                             modifier = Modifier.padding(paddingValues)
                         )
                     }
@@ -172,7 +138,7 @@ fun ActivityScreen(
                     is ActivityContent.Explaining -> {
                         ExplainingContent(
                             content = activityDetail.content,
-                            onComplete = { isCompleted = true },
+                            onComplete = { viewModel.completeActivity() },
                             modifier = Modifier.padding(paddingValues)
                         )
                     }
@@ -180,7 +146,7 @@ fun ActivityScreen(
                     is ActivityContent.Test -> {
                         TestContent(
                             content = activityDetail.content,
-                            onComplete = { score -> isCompleted = true },
+                            onComplete = { score -> viewModel.completeActivity(score) },
                             modifier = Modifier.padding(paddingValues)
                         )
                     }
