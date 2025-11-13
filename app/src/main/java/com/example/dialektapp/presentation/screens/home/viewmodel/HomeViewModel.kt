@@ -9,6 +9,7 @@ import com.example.dialektapp.domain.model.User
 import com.example.dialektapp.domain.model.UserStats
 import com.example.dialektapp.domain.repository.AuthRepository
 import com.example.dialektapp.domain.repository.CoursesRepository
+import com.example.dialektapp.domain.repository.LeaderboardRepository
 import com.example.dialektapp.domain.repository.StreakRepository
 import com.example.dialektapp.domain.util.onError
 import com.example.dialektapp.domain.util.onSuccess
@@ -34,7 +35,8 @@ data class HomeUiState(
 class HomeViewModel @Inject constructor(
     private val coursesRepository: CoursesRepository,
     private val authRepository: AuthRepository,
-    private val streakRepository: StreakRepository
+    private val streakRepository: StreakRepository,
+    private val leaderboardRepository: LeaderboardRepository
 ) : ViewModel() {
 
     private val _user = MutableStateFlow<User?>(null)
@@ -68,15 +70,42 @@ class HomeViewModel @Inject constructor(
                 .onSuccess { user ->
                     Log.d("HomeViewModel", "User loaded: ${user.fullName} (${user.email})")
                     _user.value = user
-                    _stats.value = UserStats(
-                        userId = user.id,
-                        totalCoins = 1247, // Mock поки немає API
-                        weeklyCoins = 320  // Mock поки немає API
-                    )
+                    loadUserCoins()
                 }
                 .onError { error ->
                     Log.e("HomeViewModel", "Failed to load user: $error")
                 }
+        }
+    }
+
+    private fun loadUserCoins() {
+        viewModelScope.launch {
+            when (val result =
+                leaderboardRepository.getLeaderboard(com.example.dialektapp.domain.model.LeaderboardPeriod.ALL_TIME)) {
+                is Result.Success -> {
+                    val coins = result.data.currentUserEntry?.coins ?: 0
+                    Log.d("HomeViewModel", "User coins loaded: $coins")
+                    _stats.update {
+                        it.copy(
+                            userId = _user.value?.id ?: "",
+                            totalCoins = coins,
+                            weeklyCoins = 320  // Mock поки немає API
+                        )
+                    }
+                }
+
+                is Result.Error -> {
+                    Log.e("HomeViewModel", "Failed to load user coins: ${result.error}")
+                    // Залишаємо mock значення якщо не вдалося завантажити
+                    _stats.update {
+                        it.copy(
+                            userId = _user.value?.id ?: "",
+                            totalCoins = 1247, // Mock поки немає API
+                            weeklyCoins = 320  // Mock поки немає API
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -163,6 +192,9 @@ class HomeViewModel @Inject constructor(
                     _stats.update {
                         it.copy(totalCoins = newCoins)
                     }
+
+                    // Перезавантажуємо реальний баланс з сервера
+                    loadUserCoins()
 
                     _uiState.update {
                         it.copy(

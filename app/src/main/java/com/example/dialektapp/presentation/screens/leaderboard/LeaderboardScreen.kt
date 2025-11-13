@@ -15,81 +15,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.dialektapp.domain.model.LeaderboardData
 import com.example.dialektapp.domain.model.LeaderboardEntry
 import com.example.dialektapp.domain.model.LeaderboardPeriod
 import com.example.dialektapp.presentation.screens.leaderboard.components.LeaderboardContent
 import com.example.dialektapp.ui.theme.LeaderboardScreenBackgroundColor
 
-// Тимчасовий UI State до підключення ViewModel
-data class LeaderboardUiState(
-    val leaderboardData: LeaderboardData = LeaderboardData(),
-    val isLoading: Boolean = false,
-    val error: Throwable? = null,
-    val selectedPeriod: LeaderboardPeriod = LeaderboardPeriod.ALL_TIME,
-)
-
 @Composable
-fun LeaderboardScreen() {
+fun LeaderboardScreen(
+    viewModel: LeaderboardViewModel = hiltViewModel()
+) {
     var isVisible by remember { mutableStateOf(false) }
-    var selectedPeriod by remember { mutableStateOf(LeaderboardPeriod.ALL_TIME) }
-
-    // Тимчасові mock дані
-    val mockLeaderboardData = remember(selectedPeriod) {
-        LeaderboardData(
-            topEntries = listOf(
-                LeaderboardEntry(
-                    rank = 1,
-                    userId = "1",
-                    fullName = "Nikita Putri",
-                    userName = "2A",
-                    coins = 8040,
-                    profileImageUrl = null
-                ),
-                LeaderboardEntry(
-                    rank = 2,
-                    userId = "2",
-                    fullName = "Azzahra",
-                    userName = "1B",
-                    coins = 8010,
-                    profileImageUrl = null
-                ),
-                LeaderboardEntry(
-                    rank = 3,
-                    userId = "3",
-                    fullName = "Ipul Putra",
-                    userName = "3A",
-                    coins = 8000,
-                    profileImageUrl = null
-                ),
-                LeaderboardEntry(
-                    rank = 4,
-                    userId = "4",
-                    fullName = "John Doe",
-                    userName = "2B",
-                    coins = 7950,
-                    profileImageUrl = null
-                ),
-                LeaderboardEntry(
-                    rank = 5,
-                    userId = "5",
-                    fullName = "Jane Smith",
-                    userName = "3A",
-                    coins = 7900,
-                    profileImageUrl = null
-                )
-            ),
-            userRankInfo = "Sorry you still haven't earned a spot in top 50",
-            period = selectedPeriod
-        )
-    }
-
-    val uiState = LeaderboardUiState(
-        leaderboardData = mockLeaderboardData,
-        isLoading = false,
-        error = null,
-        selectedPeriod = selectedPeriod
-    )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         isVisible = true
@@ -100,7 +39,6 @@ fun LeaderboardScreen() {
             .fillMaxSize()
             .background(LeaderboardScreenBackgroundColor)
     ) {
-
         AnimatedVisibility(
             visible = isVisible,
             enter = slideInVertically(
@@ -113,12 +51,11 @@ fun LeaderboardScreen() {
             LeaderboardContent(
                 uiState = uiState,
                 isVisible = true,
-                onPeriodChanged = { period -> selectedPeriod = period }
+                onPeriodChanged = { period -> viewModel.onPeriodChanged(period) }
             )
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
