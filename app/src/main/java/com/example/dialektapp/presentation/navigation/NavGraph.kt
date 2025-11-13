@@ -122,8 +122,13 @@ fun NavGraph(
                 onBackClick = {
                     navController.popBackStack()
                 },
-                onActivityClick = { activityId ->
-                    navController.navigate(Routes.Activity(activityId = activityId))
+                onActivityClick = { lessonId, activityId ->
+                    navController.navigate(
+                        Routes.Activity(
+                            lessonId = lessonId,
+                            activityId = activityId
+                        )
+                    )
                 }
             )
         }
@@ -164,6 +169,7 @@ fun NavGraph(
         composable<Routes.Activity> { backStackEntry ->
             val activity = backStackEntry.toRoute<Routes.Activity>()
             ActivityScreen(
+                lessonId = activity.lessonId,
                 activityId = activity.activityId,
                 onBackClick = {
                     navController.popBackStack()
