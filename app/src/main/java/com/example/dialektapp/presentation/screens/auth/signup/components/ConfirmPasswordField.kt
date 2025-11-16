@@ -27,9 +27,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.dialektapp.domain.util.ValidationError
 import com.example.dialektapp.presentation.util.toUserMessage
+import com.example.dialektapp.ui.theme.AccentBlue
 import com.example.dialektapp.ui.theme.AuthErrorRed
 import com.example.dialektapp.ui.theme.BorderColor
-import com.example.dialektapp.ui.theme.Primary
 import com.example.dialektapp.ui.theme.TextSecondary
 
 @Composable
@@ -79,13 +79,13 @@ fun ConfirmPasswordField(
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = if (firstConfirmPasswordError != null) AuthErrorRed else Primary,
+                focusedBorderColor = if (firstConfirmPasswordError != null) AuthErrorRed else AccentBlue,
                 unfocusedBorderColor = if (firstConfirmPasswordError != null) AuthErrorRed else BorderColor,
-                focusedLabelColor = if (firstConfirmPasswordError != null) AuthErrorRed else Primary,
+                focusedLabelColor = if (firstConfirmPasswordError != null) AuthErrorRed else AccentBlue,
                 unfocusedLabelColor = if (firstConfirmPasswordError != null) AuthErrorRed else TextSecondary,
-                focusedTextColor = if (firstConfirmPasswordError != null) AuthErrorRed else Primary,
+                focusedTextColor = if (firstConfirmPasswordError != null) AuthErrorRed else AccentBlue,
                 unfocusedTextColor = if (firstConfirmPasswordError != null) AuthErrorRed else TextSecondary,
-                focusedLeadingIconColor = if (firstConfirmPasswordError != null) AuthErrorRed else Primary,
+                focusedLeadingIconColor = if (firstConfirmPasswordError != null) AuthErrorRed else AccentBlue,
                 unfocusedLeadingIconColor = if (firstConfirmPasswordError != null) AuthErrorRed else TextSecondary,
                 errorBorderColor = AuthErrorRed,
                 errorLabelColor = AuthErrorRed,

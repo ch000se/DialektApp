@@ -6,11 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dialektapp.domain.model.Course
 import com.example.dialektapp.domain.model.CourseModule
-import com.example.dialektapp.domain.repository.CoursesRepository
+import com.example.dialektapp.domain.usecases.courses.GetCourseModulesUseCase
+import com.example.dialektapp.domain.usecases.courses.GetCourseUseCase
 import com.example.dialektapp.domain.util.NetworkError
 import com.example.dialektapp.domain.util.onError
 import com.example.dialektapp.domain.util.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +31,8 @@ data class CourseDetailUiState(
 
 @HiltViewModel
 class CourseDetailViewModel @Inject constructor(
-    private val coursesRepository: CoursesRepository,
+    private val getCourseUseCase: GetCourseUseCase,
+    private val getCourseModulesUseCase: GetCourseModulesUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -37,20 +41,24 @@ class CourseDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CourseDetailUiState(isLoading = true))
     val uiState: StateFlow<CourseDetailUiState> = _uiState.asStateFlow()
 
+    private val TAG = "CourseDetailVM"
+    private var loadJob: Job? = null
+
     init {
-        Log.d("CourseDetailVM", "Initialized with courseId: $courseId")
+        Log.d(TAG, "Initialized with courseId: $courseId")
         loadCourseDetails()
     }
 
     private fun loadCourseDetails() {
-        viewModelScope.launch {
+        loadJob?.cancel() // Скасовуємо попереднє завантаження
+        loadJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            Log.d("CourseDetailVM", "Loading course details for courseId: $courseId")
+            Log.d(TAG, "Loading course details for courseId: $courseId")
 
             // Спробуємо отримати ID як Int
             val courseIdInt = courseId.toIntOrNull()
             if (courseIdInt == null) {
-                Log.e("CourseDetailVM", "Invalid courseId: $courseId")
+                Log.e(TAG, "Invalid courseId: $courseId")
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -60,17 +68,54 @@ class CourseDetailViewModel @Inject constructor(
                 return@launch
             }
 
-            // Завантажуємо курс
-            coursesRepository.getCourse(courseIdInt)
-                .onSuccess { course ->
-                    Log.d("CourseDetailVM", "Course loaded: ${course.name}")
-                    _uiState.update { it.copy(course = course) }
+            // Завантажуємо курс і модулі паралельно
+            val courseDeferred = async {
+                getCourseUseCase(courseIdInt)
+            }
+            val modulesDeferred = async {
+                getCourseModulesUseCase(courseIdInt)
+            }
 
-                    // Після успішного завантаження курсу, завантажуємо модулі
-                    loadModules(courseIdInt)
+            val courseResult = courseDeferred.await()
+            val modulesResult = modulesDeferred.await()
+
+            // Обробляємо результат завантаження курсу
+            courseResult
+                .onSuccess { course ->
+                    Log.d(TAG, "Course loaded: ${course.name}")
+                    _uiState.update { it.copy(course = course) }
                 }
                 .onError { error ->
-                    Log.e("CourseDetailVM", "Failed to load course: $error")
+                    Log.e(TAG, "Failed to load course: $error")
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = error
+                        )
+                    }
+                    return@launch
+                }
+
+            // Обробляємо результат завантаження модулів
+            modulesResult
+                .onSuccess { modules ->
+                    Log.d(TAG, "Modules loaded: ${modules.size} modules")
+                    modules.forEachIndexed { index, module ->
+                        Log.d(
+                            TAG,
+                            "  $index. ${module.title} (${module.progress}% completed, unlocked: ${module.isUnlocked})"
+                        )
+                    }
+                    _uiState.update {
+                        it.copy(
+                            modules = modules,
+                            isLoading = false,
+                            error = null
+                        )
+                    }
+                }
+                .onError { error ->
+                    Log.e(TAG, "Failed to load modules: $error")
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -79,37 +124,6 @@ class CourseDetailViewModel @Inject constructor(
                     }
                 }
         }
-    }
-
-    private suspend fun loadModules(courseId: Int) {
-        Log.d("CourseDetailVM", "Loading modules for course: $courseId")
-
-        coursesRepository.getCourseModules(courseId)
-            .onSuccess { modules ->
-                Log.d("CourseDetailVM", "Modules loaded: ${modules.size} modules")
-                modules.forEachIndexed { index, module ->
-                    Log.d(
-                        "CourseDetailVM",
-                        "  $index. ${module.title} (${module.progress}% completed, unlocked: ${module.isUnlocked})"
-                    )
-                }
-                _uiState.update {
-                    it.copy(
-                        modules = modules,
-                        isLoading = false,
-                        error = null
-                    )
-                }
-            }
-            .onError { error ->
-                Log.e("CourseDetailVM", "Failed to load modules: $error")
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = error
-                    )
-                }
-            }
     }
 
     fun toggleModuleExpansion(moduleId: String) {
@@ -121,7 +135,13 @@ class CourseDetailViewModel @Inject constructor(
     }
 
     fun retry() {
-        Log.d("CourseDetailVM", "Retrying to load course details")
+        Log.d(TAG, "Retrying to load course details")
         loadCourseDetails()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        loadJob?.cancel()
+        Log.d(TAG, "CourseDetailViewModel cleared, jobs cancelled")
     }
 }

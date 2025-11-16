@@ -13,7 +13,7 @@ fun ActivityDetailDto.toDomain(): ActivityDetail {
     return ActivityDetail(
         activity = com.example.dialektapp.domain.model.LessonActivity(
             id = activityId.toString(),
-            lessonId = "", // Може не знадобитись тут
+            lessonId = "", // Може не знадобитись тут(?)
             name = content.title ?: "",
             type = content.type.toActivityType(),
             duration = "",

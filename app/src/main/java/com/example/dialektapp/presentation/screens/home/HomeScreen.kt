@@ -15,8 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.dialektapp.presentation.screens.home.components.*
-import com.example.dialektapp.presentation.screens.home.viewmodel.HomeViewModel
-import com.example.dialektapp.ui.theme.BackColor
+import com.example.dialektapp.ui.theme.BackgroundDeepBlue
 import com.example.dialektapp.ui.theme.HomeSurfaceColor
 import com.example.dialektapp.ui.theme.LeaderboardListCardBackground
 import com.example.dialektapp.ui.theme.LeaderboardListCardSecondaryBackground
@@ -24,6 +23,7 @@ import com.example.dialektapp.ui.theme.LeaderboardListOverlayBottom
 import com.example.dialektapp.ui.theme.LeaderboardListOverlayEnd
 import com.example.dialektapp.ui.theme.LeaderboardListOverlayMiddle
 import com.example.dialektapp.ui.theme.LeaderboardListOverlayStart
+import com.example.dialektapp.presentation.screens.home.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +46,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackColor)
+            .background(BackgroundDeepBlue)
     ) {
         AnimatedVisibility(
             visible = isVisible,

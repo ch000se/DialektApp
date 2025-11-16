@@ -1,13 +1,9 @@
 package com.example.dialektapp.di
 
 import android.content.Context
-import com.example.dialektapp.data.remote.ActivitiesApi
-import com.example.dialektapp.data.remote.AuthApi
-import com.example.dialektapp.data.remote.CoursesApi
-import com.example.dialektapp.data.remote.LeaderboardApi
-import com.example.dialektapp.data.remote.StreakApi
-import com.example.dialektapp.data.remote.TokenInterceptor
-import com.example.dialektapp.data.remote.TokenManager
+import com.example.dialektapp.data.local.TokenManager
+import com.example.dialektapp.data.remote.api.*
+import com.example.dialektapp.data.remote.network.TokenInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -80,4 +76,9 @@ object NetworkModule {
     @Singleton
     fun provideLeaderboardApi(retrofit: Retrofit): LeaderboardApi =
         retrofit.create(LeaderboardApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideAchievementsApi(retrofit: Retrofit): AchievementsApi =
+        retrofit.create(AchievementsApi::class.java)
 }

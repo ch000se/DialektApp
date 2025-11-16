@@ -1,5 +1,6 @@
-package com.example.dialektapp.data.remote
+package com.example.dialektapp.data.remote.network
 
+import com.example.dialektapp.data.local.TokenManager
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject

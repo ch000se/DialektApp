@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dialektapp.domain.model.Achievement
 import com.example.dialektapp.presentation.screens.achievements.components.AchievementItem
+import com.example.dialektapp.ui.theme.TextWhite
 
 @Composable
 fun AchievementsGrid(
@@ -25,7 +26,7 @@ fun AchievementsGrid(
             text = "Всі досягнення",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = TextWhite,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 

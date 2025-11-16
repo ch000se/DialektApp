@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.example.dialektapp.R
 import com.example.dialektapp.domain.model.DailyStreakData
 import com.example.dialektapp.domain.model.DayState
-import com.example.dialektapp.presentation.screens.home.viewmodel.HomeViewModel
+import com.example.dialektapp.presentation.screens.home.HomeViewModel
 import com.example.dialektapp.ui.theme.*
 
 private val TileSpacing = 12.dp
@@ -68,7 +68,7 @@ fun DailyStreakSection(
                     .height(200.dp),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = StreakRewardGold)
+                CircularProgressIndicator(color = AccentGold)
             }
         }
         return
@@ -99,7 +99,7 @@ fun DailyStreakSection(
                     Button(
                         onClick = { viewModel.loadStreak() },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = StreakRewardGold,
+                            containerColor = AccentGold,
                             contentColor = TextPrimaryDark
                         )
                     ) {
@@ -141,9 +141,9 @@ fun DailyStreakSection(
                         2.dp,
                         Brush.horizontalGradient(
                             colors = listOf(
-                                StreakRewardGold.copy(alpha = 0.6f),
-                                StreakRewardGold,
-                                StreakRewardGold.copy(alpha = 0.6f)
+                                AccentGold.copy(alpha = 0.6f),
+                                AccentGold,
+                                AccentGold.copy(alpha = 0.6f)
                             )
                         )
                     )
@@ -256,7 +256,7 @@ private fun RewardNotification(
         Text(
             text = "Натисни на день $activeDay!",
             style = MaterialTheme.typography.bodySmall,
-            color = StreakRewardGold,
+            color = AccentGold,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp
         )
@@ -269,8 +269,8 @@ private fun RewardNotification(
                 .background(
                     brush = Brush.radialGradient(
                         colors = listOf(
-                            StreakRewardGold,
-                            StreakRewardGold.copy(alpha = 0.7f)
+                            AccentGold,
+                            AccentGold.copy(alpha = 0.7f)
                         )
                     ),
                     shape = CircleShape

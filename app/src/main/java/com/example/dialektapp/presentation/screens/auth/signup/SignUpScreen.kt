@@ -29,7 +29,7 @@ import com.example.dialektapp.presentation.screens.auth.signup.components.SignUp
 import com.example.dialektapp.presentation.util.UiEvent
 import com.example.dialektapp.presentation.util.toUserMessage
 import com.example.dialektapp.ui.theme.AppGradients
-import com.example.dialektapp.ui.theme.BackColor
+import com.example.dialektapp.ui.theme.BackgroundDeepBlue
 import com.example.dialektapp.ui.theme.DialektAppTheme
 import com.example.dialektapp.ui.theme.GradientStart
 
@@ -83,7 +83,7 @@ fun SignUpScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    color = BackColor
+                    color = BackgroundDeepBlue
                 )
                 .padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally,

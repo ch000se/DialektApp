@@ -23,7 +23,7 @@ import com.example.dialektapp.presentation.screens.auth.forgotpass.components.Fo
 import com.example.dialektapp.presentation.screens.auth.components.TopAuthBar
 import com.example.dialektapp.presentation.util.UiEvent
 import com.example.dialektapp.presentation.util.toUserMessage
-import com.example.dialektapp.ui.theme.BackColor
+import com.example.dialektapp.ui.theme.BackgroundDeepBlue
 import com.example.dialektapp.ui.theme.DialektAppTheme
 import com.example.dialektapp.ui.theme.GradientStart
 
@@ -79,7 +79,7 @@ fun ForgotPasswordScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .background(
-                    color = BackColor
+                    color = BackgroundDeepBlue
                 ),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center

@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import com.example.dialektapp.ui.theme.BackColor
+import com.example.dialektapp.ui.theme.BackgroundDeepBlue
 
 @Composable
 fun MainScreenWrapper(
@@ -57,7 +57,7 @@ fun MainScreenWrapper(
                 }
             )
         },
-        containerColor = BackColor
+        containerColor = BackgroundDeepBlue
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             content()

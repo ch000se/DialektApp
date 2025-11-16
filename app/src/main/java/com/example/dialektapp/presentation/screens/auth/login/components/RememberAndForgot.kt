@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import com.example.dialektapp.ui.theme.Primary
+import com.example.dialektapp.ui.theme.AccentBlue
 import com.example.dialektapp.ui.theme.TextPrimary
 import com.example.dialektapp.ui.theme.TextSecondary
 
@@ -35,7 +35,7 @@ fun RememberAndForgot(
                 checked = rememberMe,
                 onCheckedChange = onRememberMeChange,
                 colors = CheckboxDefaults.colors(
-                    checkedColor = Primary
+                    checkedColor = AccentBlue
                 )
             )
             Text(
@@ -50,7 +50,7 @@ fun RememberAndForgot(
         ) {
             Text(
                 text = "Забули пароль?",
-                color = Primary,
+                color = AccentBlue,
                 fontWeight = FontWeight.Medium
             )
         }

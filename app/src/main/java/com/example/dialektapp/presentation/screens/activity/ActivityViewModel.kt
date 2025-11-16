@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dialektapp.domain.model.ActivityDetail
-import com.example.dialektapp.domain.repository.ActivitiesRepository
+import com.example.dialektapp.domain.usecases.activities.GetActivityDetailUseCase
+import com.example.dialektapp.domain.usecases.activities.UpdateActivityProgressUseCase
 import com.example.dialektapp.domain.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -23,20 +25,25 @@ data class ActivityUiState(
 
 @HiltViewModel
 class ActivityViewModel @Inject constructor(
-    private val activitiesRepository: ActivitiesRepository
+    private val getActivityDetailUseCase: GetActivityDetailUseCase,
+    private val updateActivityProgressUseCase: UpdateActivityProgressUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ActivityUiState())
     val uiState = _uiState.asStateFlow()
 
     private val TAG = "ActivityViewModel"
+    private var loadJob: Job? = null
+    private var completeJob: Job? = null
+    private var unlockJob: Job? = null
 
     fun loadActivity(activityId: String) {
-        viewModelScope.launch {
+        loadJob?.cancel() // Скасовуємо попереднє завантаження
+        loadJob = viewModelScope.launch {
             Log.d(TAG, "Loading activity: $activityId")
             _uiState.update { it.copy(isLoading = true, error = null) }
 
-            when (val result = activitiesRepository.getActivityDetail(activityId.toInt())) {
+            when (val result = getActivityDetailUseCase(activityId.toInt())) {
                 is Result.Success -> {
                     Log.d(TAG, "Activity loaded successfully: ${result.data.activity.name}")
                     _uiState.update {
@@ -92,12 +99,13 @@ class ActivityViewModel @Inject constructor(
     fun completeActivity(score: Int? = null) {
         val currentActivity = _uiState.value.activityDetail?.activity ?: return
 
-        viewModelScope.launch {
+        completeJob?.cancel() // Скасовуємо попереднє завершення
+        completeJob = viewModelScope.launch {
             Log.d(TAG, "Completing activity: ${currentActivity.id}, score: $score")
 
             _uiState.update { it.copy(isLoading = true) }
 
-            val result = activitiesRepository.updateActivityProgress(
+            val result = updateActivityProgressUseCase(
                 activityId = currentActivity.id.toInt(),
                 status = "completed",
                 score = score,
@@ -132,10 +140,11 @@ class ActivityViewModel @Inject constructor(
     }
 
     fun unlockActivity(activityId: Int) {
-        viewModelScope.launch {
+        unlockJob?.cancel() // Скасовуємо попереднє розблокування
+        unlockJob = viewModelScope.launch {
             Log.d(TAG, "Unlocking activity: $activityId")
 
-            activitiesRepository.updateActivityProgress(
+            updateActivityProgressUseCase(
                 activityId = activityId,
                 isUnlocked = true
             )
@@ -147,5 +156,13 @@ class ActivityViewModel @Inject constructor(
         if (activityId != null) {
             loadActivity(activityId.toString())
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        loadJob?.cancel()
+        completeJob?.cancel()
+        unlockJob?.cancel()
+        Log.d(TAG, "ActivityViewModel cleared, jobs cancelled")
     }
 }

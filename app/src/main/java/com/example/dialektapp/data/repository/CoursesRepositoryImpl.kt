@@ -2,8 +2,8 @@ package com.example.dialektapp.data.repository
 
 import android.util.Log
 import com.example.dialektapp.data.mappers.toDomain
-import com.example.dialektapp.data.remote.CoursesApi
-import com.example.dialektapp.data.remote.safeCall
+import com.example.dialektapp.data.remote.api.CoursesApi
+import com.example.dialektapp.data.remote.util.safeCall
 import com.example.dialektapp.domain.model.Course
 import com.example.dialektapp.domain.model.CourseModule
 import com.example.dialektapp.domain.model.Lesson

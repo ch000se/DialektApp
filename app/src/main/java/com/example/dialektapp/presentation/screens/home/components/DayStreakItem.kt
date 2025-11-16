@@ -3,6 +3,7 @@ package com.example.dialektapp.presentation.screens.home.components
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -53,9 +55,9 @@ fun DayStreakItem(
 
     val cardColor by animateColorAsState(
         targetValue = when {
-            hasReward -> StreakRewardGold.copy(alpha = 0.9f)
-            dayState == DayState.Completed -> LightPrimary.copy(alpha = 0.6f)
-            dayState == DayState.Active -> LightPrimary
+            hasReward -> AccentGold
+            dayState == DayState.Completed -> AccentPrimary.copy(alpha = 0.6f)
+            dayState == DayState.Active -> AccentPrimary
             else -> StreakUpcomingTileColor
         },
         animationSpec = tween(500),
@@ -100,13 +102,20 @@ fun DayStreakItem(
             border = if (hasReward) {
                 BorderStroke(
                     2.dp,
-                    StreakRewardGold
+                    AccentGold
                 )
             } else null
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .background(
+                        color = when (dayState) {
+                            DayState.Completed -> AccentPrimary.copy(alpha = 0.6f)
+                            else -> Color.Transparent
+                        },
+                        shape = RoundedCornerShape(TileCornerRadius)
+                    )
                     .padding(InnerPadding),
                 contentAlignment = Alignment.Center
             ) {
@@ -115,7 +124,7 @@ fun DayStreakItem(
                         Icon(
                             imageVector = Icons.Default.Done,
                             contentDescription = "Completed",
-                            tint = StreakActiveIconTint,
+                            tint = TextPrimaryDark,
                             modifier = Modifier.size(20.dp),
                         )
                     }
@@ -128,7 +137,7 @@ fun DayStreakItem(
                                 ImageVector.vectorResource(R.drawable.rocket_launch)
                             },
                             contentDescription = if (hasReward) "Reward" else "Active",
-                            tint = if (hasReward) TextPrimaryDark else StreakActiveIconTint,
+                            tint = TextPrimaryDark,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -149,10 +158,10 @@ fun DayStreakItem(
 
         val textColor by animateColorAsState(
             targetValue = when {
-                hasReward -> StreakRewardGold
+                hasReward -> AccentGold
                 dayState == DayState.Completed -> TextPrimaryDark.copy(alpha = 0.7f)
                 dayState == DayState.Active -> TextPrimaryDark
-                else -> TextPrimaryDark.copy(alpha = 0.7f)
+                else -> TextPrimaryDark.copy(alpha = 0.5f)
             },
             animationSpec = tween(500),
             label = "textColor"

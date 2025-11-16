@@ -71,7 +71,7 @@ fun CoursesSection(
                     .height(160.dp),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = Primary)
+                CircularProgressIndicator(color = AccentBlue)
             }
         } else {
             LazyRow(

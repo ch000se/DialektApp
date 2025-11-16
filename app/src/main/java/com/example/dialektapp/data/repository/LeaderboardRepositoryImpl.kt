@@ -2,8 +2,8 @@ package com.example.dialektapp.data.repository
 
 import android.util.Log
 import com.example.dialektapp.data.mappers.toDomain
-import com.example.dialektapp.data.remote.LeaderboardApi
-import com.example.dialektapp.data.remote.safeCall
+import com.example.dialektapp.data.remote.api.LeaderboardApi
+import com.example.dialektapp.data.remote.util.safeCall
 import com.example.dialektapp.domain.model.LeaderboardData
 import com.example.dialektapp.domain.model.LeaderboardPeriod
 import com.example.dialektapp.domain.repository.LeaderboardRepository

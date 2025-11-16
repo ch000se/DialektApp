@@ -58,8 +58,8 @@ fun CourseDetailScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            BackColor.copy(alpha = 0.7f),
-                            BackColor.copy(alpha = 0.9f)
+                            BackgroundDeepBlue.copy(alpha = 0.7f),
+                            BackgroundDeepBlue.copy(alpha = 0.9f)
                         )
                     )
                 )
@@ -97,7 +97,7 @@ fun CourseDetailScreen(
                     uiState.isLoading -> {
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.Center),
-                            color = Primary
+                            color = AccentBlue
                         )
                     }
 
@@ -117,7 +117,7 @@ fun CourseDetailScreen(
                             Button(
                                 onClick = { viewModel.retry() },
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Primary,
+                                    containerColor = AccentBlue,
                                     contentColor = Color.Black
                                 )
                             ) {

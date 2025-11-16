@@ -1,4 +1,4 @@
-package com.example.dialektapp.data.remote
+package com.example.dialektapp.data.local
 
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
@@ -34,4 +34,3 @@ class TokenManager @Inject constructor(
         prefs.edit { remove("jwt") }
     }
 }
-

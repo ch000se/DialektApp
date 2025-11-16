@@ -36,11 +36,10 @@ import com.example.dialektapp.presentation.screens.auth.login.components.TopLogi
 import com.example.dialektapp.presentation.util.UiEvent
 import com.example.dialektapp.presentation.util.toUserMessage
 import com.example.dialektapp.ui.theme.AppGradients
-import com.example.dialektapp.ui.theme.BackColor
+import com.example.dialektapp.ui.theme.BackgroundDeepBlue
 import com.example.dialektapp.ui.theme.GradientEnd
 import com.example.dialektapp.ui.theme.GradientMiddle
 import com.example.dialektapp.ui.theme.GradientStart
-import com.example.dialektapp.ui.theme.Primary
 import kotlinx.coroutines.launch
 
 
@@ -96,7 +95,7 @@ fun LoginScreen(
         modifier = modifier
             .fillMaxSize()
             .background(
-                color = BackColor
+                color = BackgroundDeepBlue
             )
             .padding(contentPadding),
         horizontalAlignment = Alignment.CenterHorizontally,

@@ -1,10 +1,12 @@
 package com.example.dialektapp.di
 
+import com.example.dialektapp.data.repository.AchievementsRepositoryImpl
 import com.example.dialektapp.data.repository.ActivitiesRepositoryImpl
 import com.example.dialektapp.data.repository.AuthRepositoryImpl
 import com.example.dialektapp.data.repository.CoursesRepositoryImpl
 import com.example.dialektapp.data.repository.LeaderboardRepositoryImpl
 import com.example.dialektapp.data.repository.StreakRepositoryImpl
+import com.example.dialektapp.domain.repository.AchievementsRepository
 import com.example.dialektapp.domain.repository.ActivitiesRepository
 import com.example.dialektapp.domain.repository.AuthRepository
 import com.example.dialektapp.domain.repository.CoursesRepository
@@ -41,4 +43,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindLeaderboardRepository(leaderboardRepositoryImpl: LeaderboardRepositoryImpl): LeaderboardRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAchievementsRepository(achievementsRepositoryImpl: AchievementsRepositoryImpl): AchievementsRepository
 }

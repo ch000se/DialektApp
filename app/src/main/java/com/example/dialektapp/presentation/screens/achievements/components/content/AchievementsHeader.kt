@@ -15,6 +15,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dialektapp.ui.theme.AccentPrimary
+import com.example.dialektapp.ui.theme.TextWhite
 
 @Composable
 fun AchievementsHeader(
@@ -79,7 +81,7 @@ fun AchievementsHeader(
                 )
 
                 Surface(
-                    color = Color(0xFFD1F501),
+                    color = AccentPrimary,
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
@@ -102,7 +104,7 @@ fun AchievementsHeader(
                         .fillMaxWidth()
                         .height(12.dp)
                         .clip(RoundedCornerShape(6.dp)),
-                    color = Color(0xFFD1F501),
+                    color = AccentPrimary,
                     trackColor = Color.White.copy(alpha = 0.2f),
                     strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
                 )
@@ -117,13 +119,13 @@ fun AchievementsHeader(
                         text = "${(progress * 100).toInt()}%",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFD1F501)
+                        color = AccentPrimary
                     )
 
                     Text(
                         text = if (progress >= 1f) "Всі відкриті! 🎉" else "Продовжуйте!",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.9f),
+                        color = TextWhite.copy(alpha = 0.9f),
                         fontWeight = FontWeight.Medium
                     )
                 }

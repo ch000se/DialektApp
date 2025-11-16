@@ -26,9 +26,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.dialektapp.domain.util.ValidationError
 import com.example.dialektapp.presentation.util.toUserMessage
+import com.example.dialektapp.ui.theme.AccentBlue
 import com.example.dialektapp.ui.theme.AuthErrorRed
 import com.example.dialektapp.ui.theme.BorderColor
-import com.example.dialektapp.ui.theme.Primary
 import com.example.dialektapp.ui.theme.TextSecondary
 
 @Composable
@@ -80,13 +80,13 @@ fun PasswordField(
             isError = firstPasswordError != null,
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = if (firstPasswordError != null) AuthErrorRed else Primary,
+                focusedBorderColor = if (firstPasswordError != null) AuthErrorRed else AccentBlue,
                 unfocusedBorderColor = if (firstPasswordError != null) AuthErrorRed else BorderColor,
-                focusedLabelColor = if (firstPasswordError != null) AuthErrorRed else Primary,
+                focusedLabelColor = if (firstPasswordError != null) AuthErrorRed else AccentBlue,
                 unfocusedLabelColor = if (firstPasswordError != null) AuthErrorRed else TextSecondary,
-                focusedTextColor = if (firstPasswordError != null) AuthErrorRed else Primary,
+                focusedTextColor = if (firstPasswordError != null) AuthErrorRed else AccentBlue,
                 unfocusedTextColor = if (firstPasswordError != null) AuthErrorRed else TextSecondary,
-                focusedLeadingIconColor = if (firstPasswordError != null) AuthErrorRed else Primary,
+                focusedLeadingIconColor = if (firstPasswordError != null) AuthErrorRed else AccentBlue,
                 unfocusedLeadingIconColor = if (firstPasswordError != null) AuthErrorRed else TextSecondary,
                 errorBorderColor = AuthErrorRed,
                 errorLabelColor = AuthErrorRed,
