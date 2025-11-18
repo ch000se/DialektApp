@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dialektapp.ui.theme.AccentPrimary
+import com.example.dialektapp.ui.theme.CardBackground
 import com.example.dialektapp.ui.theme.TextWhite
 
 @Composable
@@ -41,7 +42,7 @@ fun AchievementsHeader(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.15f)
+            containerColor = CardBackground
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -64,7 +65,7 @@ fun AchievementsHeader(
                 text = "Ваші досягнення",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = TextWhite
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -77,7 +78,7 @@ fun AchievementsHeader(
                 Text(
                     text = "Відкрито",
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f)
+                    color = TextWhite.copy(alpha = 0.8f)
                 )
 
                 Surface(

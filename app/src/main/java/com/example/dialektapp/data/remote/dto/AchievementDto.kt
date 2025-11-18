@@ -2,6 +2,30 @@ package com.example.dialektapp.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
+enum class AchievementCategory {
+    @SerializedName("GENERAL")
+    GENERAL,
+    @SerializedName("LEARNING")
+    LEARNING,
+    @SerializedName("SOCIAL")
+    SOCIAL,
+    @SerializedName("STREAK")
+    STREAK,
+    @SerializedName("SPECIAL")
+    SPECIAL
+}
+
+enum class AchievementRarity {
+    @SerializedName("COMMON")
+    COMMON,
+    @SerializedName("RARE")
+    RARE,
+    @SerializedName("EPIC")
+    EPIC,
+    @SerializedName("LEGENDARY")
+    LEGENDARY
+}
+
 data class AchievementDto(
     @SerializedName("id")
     val id: Int,
@@ -16,7 +40,7 @@ data class AchievementDto(
     @SerializedName("is_unlocked")
     val isUnlocked: Boolean,
     @SerializedName("category")
-    val category: String, // "GENERAL", "LEARNING", "SOCIAL", "STREAK", "SPECIAL"
+    val category: AchievementCategory,
     @SerializedName("rarity")
-    val rarity: String // "COMMON", "RARE", "EPIC", "LEGENDARY"
+    val rarity: AchievementRarity
 )

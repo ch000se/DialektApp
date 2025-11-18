@@ -136,7 +136,6 @@ class SignUpViewModel @Inject constructor(
             result.onSuccess {
                 Log.d(TAG, "Registration successful")
                 _signUpState.value = _signUpState.value.copy(isSuccess = true)
-                _uiEvent.send(UiEvent.ShowSnackbar("Реєстрація успішна! Тепер ви можете увійти"))
                 _uiEvent.send(UiEvent.Navigate)
             }.onError { error ->
                 Log.e(TAG, "Registration error: $error")

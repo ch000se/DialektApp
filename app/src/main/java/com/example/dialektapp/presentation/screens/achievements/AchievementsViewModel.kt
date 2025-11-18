@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dialektapp.domain.model.Achievement
 import com.example.dialektapp.domain.usecases.achievements.GetMyAchievementsUseCase
-import com.example.dialektapp.domain.usecases.achievements.UnlockAchievementUseCase
 import com.example.dialektapp.domain.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -26,8 +25,7 @@ data class AchievementsUiState(
 
 @HiltViewModel
 class AchievementsViewModel @Inject constructor(
-    private val getMyAchievementsUseCase: GetMyAchievementsUseCase,
-    private val unlockAchievementUseCase: UnlockAchievementUseCase
+    private val getMyAchievementsUseCase: GetMyAchievementsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AchievementsUiState())
@@ -35,7 +33,6 @@ class AchievementsViewModel @Inject constructor(
 
     private val TAG = "AchievementsViewModel"
     private var loadJob: Job? = null
-    private var unlockJob: Job? = null
 
     init {
         loadAchievements()
@@ -73,32 +70,6 @@ class AchievementsViewModel @Inject constructor(
                             error = errorMessage
                         )
                     }
-                }
-            }
-        }
-    }
-
-    fun unlockAchievement(achievementId: String) {
-        unlockJob?.cancel() // Скасовуємо попереднє розблокування
-        unlockJob = viewModelScope.launch {
-            Log.d(TAG, "Unlocking achievement: $achievementId")
-
-            val id = achievementId.toIntOrNull() ?: run {
-                Log.e(TAG, "Invalid achievement ID: $achievementId")
-                return@launch
-            }
-
-            when (val result = unlockAchievementUseCase(id)) {
-                is Result.Success -> {
-                    Log.d(TAG, "Achievement unlocked: ${result.data.title}")
-                    // Перезавантажуємо список після успішного розблокування
-                    loadAchievements()
-                }
-
-                is Result.Error -> {
-                    Log.e(TAG, "Error unlocking achievement: ${result.error}")
-                    val errorMessage = mapNetworkError(result.error)
-                    _uiState.update { it.copy(error = errorMessage) }
                 }
             }
         }
@@ -142,7 +113,6 @@ class AchievementsViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         loadJob?.cancel()
-        unlockJob?.cancel()
         Log.d(TAG, "AchievementsViewModel cleared, jobs cancelled")
     }
 }

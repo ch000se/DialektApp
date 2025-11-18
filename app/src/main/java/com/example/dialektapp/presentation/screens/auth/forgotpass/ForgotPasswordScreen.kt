@@ -38,7 +38,7 @@ fun ForgotPasswordScreen(
     val context = LocalContext.current
     val state by viewModel.forgotPasswordState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is UiEvent.ShowSnackbar -> {

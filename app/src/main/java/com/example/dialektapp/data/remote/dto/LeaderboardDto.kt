@@ -2,6 +2,13 @@ package com.example.dialektapp.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
+enum class LeaderboardPeriod {
+    @SerializedName("ALL_TIME")
+    ALL_TIME,
+    @SerializedName("WEEKLY")
+    WEEKLY
+}
+
 data class LeaderboardResponseDto(
     @SerializedName("currentUserEntry")
     val currentUserEntry: LeaderboardEntryDto?,
@@ -10,7 +17,7 @@ data class LeaderboardResponseDto(
     @SerializedName("userRankInfo")
     val userRankInfo: String,
     @SerializedName("period")
-    val period: String // "ALL_TIME" or "WEEKLY"
+    val period: LeaderboardPeriod
 )
 
 data class LeaderboardEntryDto(

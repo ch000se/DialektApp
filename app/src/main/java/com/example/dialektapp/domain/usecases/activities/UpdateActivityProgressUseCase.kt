@@ -1,5 +1,6 @@
 package com.example.dialektapp.domain.usecases.activities
 
+import com.example.dialektapp.data.remote.dto.ActivityStatus
 import com.example.dialektapp.domain.repository.ActivitiesRepository
 import com.example.dialektapp.domain.util.NetworkError
 import com.example.dialektapp.domain.util.Result
@@ -10,7 +11,7 @@ class UpdateActivityProgressUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         activityId: Int,
-        status: String? = null,
+        status: ActivityStatus? = null,
         isUnlocked: Boolean? = null,
         score: Int? = null,
         addAttempt: Boolean? = null

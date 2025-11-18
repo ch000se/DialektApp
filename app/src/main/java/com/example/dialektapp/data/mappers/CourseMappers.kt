@@ -1,6 +1,7 @@
 package com.example.dialektapp.data.mappers
 
 import com.example.dialektapp.data.remote.dto.ActivityDto
+import com.example.dialektapp.data.remote.dto.ActivityType as ActivityTypeDto
 import com.example.dialektapp.data.remote.dto.CourseDto
 import com.example.dialektapp.data.remote.dto.LessonDto
 import com.example.dialektapp.data.remote.dto.ModuleDto
@@ -62,7 +63,7 @@ fun ActivityDto.toDomain(): LessonActivity {
         id = id.toString(),
         lessonId = lessonId.toString(),
         name = name,
-        type = type.toActivityType(),
+        type = type.toDomainActivityType(),
         duration = duration,
         order = 0, // прибрати з API треба буде
         isCompleted = isCompleted,
@@ -70,12 +71,11 @@ fun ActivityDto.toDomain(): LessonActivity {
     )
 }
 
-private fun String.toActivityType(): ActivityType {
-    return when (this.uppercase()) {
-        "INTRODUCTION" -> ActivityType.INTRODUCTION
-        "READING" -> ActivityType.READING
-        "EXPLAINING" -> ActivityType.EXPLAINING
-        "TEST" -> ActivityType.TEST
-        else -> ActivityType.INTRODUCTION // fallback
+private fun ActivityTypeDto.toDomainActivityType(): ActivityType {
+    return when (this) {
+        ActivityTypeDto.INTRODUCTION -> ActivityType.INTRODUCTION
+        ActivityTypeDto.READING -> ActivityType.READING
+        ActivityTypeDto.EXPLAINING -> ActivityType.EXPLAINING
+        ActivityTypeDto.TEST -> ActivityType.TEST
     }
 }

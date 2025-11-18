@@ -10,6 +10,6 @@ class GetCourseUseCase @Inject constructor(
     private val repository: CoursesRepository
 ) {
     suspend operator fun invoke(courseId: Int): Result<Course, NetworkError> {
-        return repository.getCourse(courseId)
+        return repository.getMyCourse(courseId)
     }
 }

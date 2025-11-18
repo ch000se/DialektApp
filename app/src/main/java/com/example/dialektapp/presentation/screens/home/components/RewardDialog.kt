@@ -28,10 +28,12 @@ import kotlinx.coroutines.delay
 fun RewardDialog(
     day: Int,
     amount: Int,
+    isClaimingReward: Boolean = false,
+    claimErrorMessage: String? = null,
     onDismiss: () -> Unit,
     onClaim: (Int) -> Unit,
 ) {
-    Dialog(onDismissRequest = onDismiss) {
+    Dialog(onDismissRequest = { if (!isClaimingReward) onDismiss() }) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -129,13 +131,27 @@ fun RewardDialog(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
+                // Показуємо помилку якщо є
+                if (claimErrorMessage != null) {
+                    Text(
+                        text = claimErrorMessage,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
                 Button(
                     onClick = { onClaim(amount) },
+                    enabled = !isClaimingReward,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent
+                        containerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent
                     ),
                     contentPadding = PaddingValues(0.dp),
                     shape = RoundedCornerShape(16.dp)
@@ -144,26 +160,50 @@ fun RewardDialog(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(
-                                brush = GoldGradient,
+                                brush = if (isClaimingReward) {
+                                    Brush.horizontalGradient(
+                                        colors = listOf(
+                                            AccentGold.copy(alpha = 0.5f),
+                                            AccentGold.copy(alpha = 0.7f)
+                                        )
+                                    )
+                                } else {
+                                    GoldGradient
+                                },
                                 shape = RoundedCornerShape(16.dp)
                             ),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "Забрати нагороду!",
-                            color = TextPrimaryDark,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        )
+                        if (isClaimingReward) {
+                            CircularProgressIndicator(
+                                color = TextPrimaryDark,
+                                modifier = Modifier.size(24.dp),
+                                strokeWidth = 3.dp
+                            )
+                        } else {
+                            Text(
+                                text = "Забрати нагороду!",
+                                color = TextPrimaryDark,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            )
+                        }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                TextButton(onClick = onDismiss) {
+                TextButton(
+                    onClick = onDismiss,
+                    enabled = !isClaimingReward
+                ) {
                     Text(
                         text = "Пізніше",
-                        color = TextSecondaryLight
+                        color = if (isClaimingReward) {
+                            TextSecondaryLight.copy(alpha = 0.5f)
+                        } else {
+                            TextSecondaryLight
+                        }
                     )
                 }
             }

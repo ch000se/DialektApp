@@ -15,11 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.dialektapp.R
 import com.example.dialektapp.presentation.screens.course.components.*
 import com.example.dialektapp.ui.theme.*
@@ -38,7 +37,7 @@ fun CourseDetailScreen(
     courseId: String,
     courseName: String,
     onBackClick: () -> Unit,
-    onModuleClick: (String) -> Unit,
+    onModuleClick: (courseId: String, moduleId: String) -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: CourseDetailViewModel = hiltViewModel()
 ) {
@@ -146,7 +145,7 @@ fun CourseDetailScreen(
                                         viewModel.toggleModuleExpansion(module.id)
                                     },
                                     onLessonClick = {
-                                        onModuleClick(module.id)
+                                        onModuleClick(courseId, module.id)
                                     }
                                 )
                             }

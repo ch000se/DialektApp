@@ -39,8 +39,17 @@ fun HomeScreen(
     val courses by viewModel.courses.collectAsStateWithLifecycle()
     val isLoadingCourses by viewModel.isLoadingCourses.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        isVisible = true
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshData()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     Column(
@@ -49,7 +58,7 @@ fun HomeScreen(
             .background(BackgroundDeepBlue)
     ) {
         AnimatedVisibility(
-            visible = isVisible,
+            visible = true,
             enter = slideInVertically(
                 animationSpec = tween(600, delayMillis = 100),
                 initialOffsetY = { -it / 2 }
@@ -63,7 +72,6 @@ fun HomeScreen(
             ) {
                 TopUserBar(
                     user = user,
-                    onProfileClick = onProfileClick,
                     coinsCount = stats.totalCoins
                 )
 
@@ -72,7 +80,7 @@ fun HomeScreen(
         }
 
         AnimatedVisibility(
-            visible = isVisible,
+            visible = true,
             enter = slideInVertically(
                 animationSpec = tween(800, delayMillis = 200),
                 initialOffsetY = { it / 2 }

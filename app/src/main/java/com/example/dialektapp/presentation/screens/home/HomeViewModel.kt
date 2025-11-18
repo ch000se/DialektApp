@@ -10,6 +10,7 @@ import com.example.dialektapp.domain.model.UserStats
 import com.example.dialektapp.domain.usecases.auth.GetCurrentUserUseCase
 import com.example.dialektapp.domain.usecases.courses.GetMyCoursesUseCase
 import com.example.dialektapp.domain.usecases.leaderboard.GetLeaderboardUseCase
+import com.example.dialektapp.domain.usecases.stats.GetMyStatsUseCase
 import com.example.dialektapp.domain.usecases.streak.ClaimStreakUseCase
 import com.example.dialektapp.domain.usecases.streak.GetStreakUseCase
 import com.example.dialektapp.domain.util.onError
@@ -34,6 +35,7 @@ data class HomeUiState(
     val isLoadingStreak: Boolean = false,
     val isClaimingStreak: Boolean = false,
     val streakError: String? = null,
+    val claimError: String? = null,
     val showRewardDialog: Boolean = false,
     val lastClaimedReward: Int? = null
 )
@@ -42,6 +44,7 @@ data class HomeUiState(
 class HomeViewModel @Inject constructor(
     private val getMyCoursesUseCase: GetMyCoursesUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val getMyStatsUseCase: GetMyStatsUseCase,
     private val getStreakUseCase: GetStreakUseCase,
     private val claimStreakUseCase: ClaimStreakUseCase,
     private val getLeaderboardUseCase: GetLeaderboardUseCase
@@ -50,7 +53,7 @@ class HomeViewModel @Inject constructor(
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user.asStateFlow()
 
-    private val _stats = MutableStateFlow(UserStats(userId = "", totalCoins = 0, weeklyCoins = 0))
+    private val _stats = MutableStateFlow(UserStats(userId = 0, totalCoins = 0, weeklyCoins = 0))
     val stats: StateFlow<UserStats> = _stats.asStateFlow()
 
     private val _courses = MutableStateFlow<List<Course>>(emptyList())
@@ -103,37 +106,49 @@ class HomeViewModel @Inject constructor(
             .onSuccess { user ->
                 Log.d(TAG, "User loaded: ${user.fullName} (${user.email})")
                 _user.value = user
-                loadUserCoinsInternal()
+                loadUserStatsInternal()
             }
             .onError { error ->
                 Log.e(TAG, "Failed to load user: $error")
             }
     }
 
-    private suspend fun loadUserCoinsInternal() {
+    private suspend fun loadUserStatsInternal() {
+        Log.d(TAG, "Loading user stats...")
+        when (val result = getMyStatsUseCase()) {
+            is Result.Success -> {
+                val stats = result.data
+                Log.d(
+                    TAG,
+                    "Stats loaded: totalCoins=${stats.totalCoins}, weeklyCoins=${stats.weeklyCoins}"
+                )
+                _stats.value = stats
+            }
+
+            is Result.Error -> {
+                Log.e(TAG, "Failed to load stats: ${result.error}")
+                // Fallback: намагаємося отримати монети з leaderboard
+                loadUserCoinsFromLeaderboard()
+            }
+        }
+    }
+
+    private suspend fun loadUserCoinsFromLeaderboard() {
+        Log.d(TAG, "Fallback: loading coins from leaderboard...")
         when (val result =
             getLeaderboardUseCase(com.example.dialektapp.domain.model.LeaderboardPeriod.ALL_TIME)) {
             is Result.Success -> {
                 val coins = result.data.currentUserEntry?.coins ?: 0
-                Log.d(TAG, "User coins loaded: $coins")
+                Log.d(TAG, "User coins loaded from leaderboard: $coins")
                 _stats.update {
                     it.copy(
-                        userId = _user.value?.id ?: "",
-                        totalCoins = coins,
-                        weeklyCoins = 320  // Mock поки немає API
+                        totalCoins = coins
                     )
                 }
             }
 
             is Result.Error -> {
-                Log.e(TAG, "Failed to load user coins: ${result.error}")
-                _stats.update {
-                    it.copy(
-                        userId = _user.value?.id ?: "",
-                        totalCoins = 1247,
-                        weeklyCoins = 320
-                    )
-                }
+                Log.e(TAG, "Failed to load user coins from leaderboard: ${result.error}")
             }
         }
     }
@@ -206,45 +221,48 @@ class HomeViewModel @Inject constructor(
     fun claimStreak() {
         viewModelScope.launch {
             Log.d(TAG, "Claiming streak reward")
-            _uiState.update { it.copy(isClaimingStreak = true) }
+            _uiState.update { it.copy(isClaimingStreak = true, claimError = null) }
 
             when (val result = claimStreakUseCase()) {
                 is Result.Success -> {
+                    val rewardAmount = result.data.todayRewardAmount
                     Log.d(
                         TAG,
-                        "Streak claimed successfully: ${result.data.todayRewardAmount} coins"
+                        "Streak claimed successfully: reward=$rewardAmount coins, NEW state: activeDay=${result.data.activeDay}, totalDays=${result.data.totalDays}, claimAvailable=${result.data.isTodayClaimAvailable}"
                     )
 
                     // Оновлюємо баланс оптимістично
                     val currentCoins = _stats.value.totalCoins
-                    val newCoins = currentCoins + result.data.todayRewardAmount
+                    val newCoins = currentCoins + rewardAmount
                     _stats.update {
                         it.copy(totalCoins = newCoins)
                     }
 
-                    // Асинхронно перезавантажуємо реальний баланс
-                    viewModelScope.launch {
-                        loadUserCoinsInternal()
-                    }
-
+                    // Оновлюємо streak дані та закриваємо діалог
                     _uiState.update {
                         it.copy(
                             streakData = result.data,
                             isClaimingStreak = false,
-                            lastClaimedReward = result.data.todayRewardAmount,
-                            showRewardDialog = false
+                            lastClaimedReward = rewardAmount,
+                            showRewardDialog = false,
+                            claimError = null
                         )
+                    }
+
+                    // Асинхронно перезавантажуємо реальний баланс для синхронізації
+                    viewModelScope.launch {
+                        loadUserStatsInternal()
                     }
                 }
 
                 is Result.Error -> {
                     val errorMessage = mapNetworkError(result.error)
                     Log.e(TAG, "Error claiming streak: $errorMessage")
+                    // Не закриваємо діалог, показуємо помилку
                     _uiState.update {
                         it.copy(
                             isClaimingStreak = false,
-                            streakError = errorMessage,
-                            showRewardDialog = false
+                            claimError = errorMessage
                         )
                     }
                 }
@@ -253,11 +271,11 @@ class HomeViewModel @Inject constructor(
     }
 
     fun showRewardDialog() {
-        _uiState.update { it.copy(showRewardDialog = true) }
+        _uiState.update { it.copy(showRewardDialog = true, claimError = null) }
     }
 
     fun hideRewardDialog() {
-        _uiState.update { it.copy(showRewardDialog = false) }
+        _uiState.update { it.copy(showRewardDialog = false, claimError = null) }
     }
 
     fun clearLastClaimedReward() {

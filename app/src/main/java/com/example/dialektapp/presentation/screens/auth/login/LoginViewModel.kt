@@ -106,7 +106,6 @@ class LoginViewModel @Inject constructor(
                 .onSuccess { user ->
                     _loginState.value = _loginState.value.copy(isLoading = false)
                     Log.d(TAG, "Login successful: $user")
-                    _uiEvent.send(UiEvent.ShowSnackbar("Вхід успішний! Ласкаво просимо!"))
                     _uiEvent.send(UiEvent.Navigate)
                 }
                 .onError { error ->

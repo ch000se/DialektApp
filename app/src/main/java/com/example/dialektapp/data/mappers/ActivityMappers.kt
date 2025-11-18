@@ -2,6 +2,7 @@ package com.example.dialektapp.data.mappers
 
 import com.example.dialektapp.data.remote.dto.ActivityContentDto
 import com.example.dialektapp.data.remote.dto.ActivityDetailDto
+import com.example.dialektapp.data.remote.dto.ActivityType
 import com.example.dialektapp.data.remote.dto.ExampleDto
 import com.example.dialektapp.data.remote.dto.QuestionDto
 import com.example.dialektapp.domain.model.ActivityContent
@@ -15,7 +16,7 @@ fun ActivityDetailDto.toDomain(): ActivityDetail {
             id = activityId.toString(),
             lessonId = "", // Може не знадобитись тут(?)
             name = content.title ?: "",
-            type = content.type.toActivityType(),
+            type = content.type.toDomainActivityType(),
             duration = "",
             order = 0,
             isCompleted = false,
@@ -26,8 +27,8 @@ fun ActivityDetailDto.toDomain(): ActivityDetail {
 }
 
 fun ActivityContentDto.toActivityContent(): ActivityContent {
-    return when (type.uppercase()) {
-        "INTRODUCTION" -> ActivityContent.Introduction(
+    return when (type) {
+        ActivityType.INTRODUCTION -> ActivityContent.Introduction(
             title = title ?: "",
             description = description ?: "",
             videoUrl = videoUrl,
@@ -35,7 +36,7 @@ fun ActivityContentDto.toActivityContent(): ActivityContent {
             keyPoints = keyPoints ?: emptyList()
         )
 
-        "READING" -> ActivityContent.Reading(
+        ActivityType.READING -> ActivityContent.Reading(
             title = title ?: "",
             text = text ?: "",
             audioUrl = audioUrl,
@@ -43,7 +44,7 @@ fun ActivityContentDto.toActivityContent(): ActivityContent {
             examples = examples?.map { it.toDomain() } ?: emptyList()
         )
 
-        "EXPLAINING" -> ActivityContent.Explaining(
+        ActivityType.EXPLAINING -> ActivityContent.Explaining(
             title = title ?: "",
             explanation = explanation ?: "",
             audioUrl = audioUrl,
@@ -51,7 +52,7 @@ fun ActivityContentDto.toActivityContent(): ActivityContent {
             tips = tips ?: emptyList()
         )
 
-        "TEST" -> ActivityContent.Test(
+        ActivityType.TEST -> ActivityContent.Test(
             title = title ?: "",
             questions = questions?.map { it.toDomain() } ?: emptyList(),
             passingScore = passingScore ?: 70
@@ -73,7 +74,19 @@ fun ExampleDto.toDomain(): Example {
 }
 
 fun QuestionDto.toDomain(): Question {
-    return when (type.uppercase()) {
+    // Backend використовує "kind" з форматом "TrueFalse", "MultipleChoice", etc.
+    // Беремо kind, якщо є, інакше type
+    val questionType = (kind ?: type ?: "MultipleChoice").uppercase()
+
+    // Маппінг з backend формату в app формат
+    val normalizedType = when {
+        questionType.contains("TRUE") || questionType.contains("FALSE") -> "TRUE_FALSE"
+        questionType.contains("MULTIPLE") || questionType.contains("CHOICE") -> "MULTIPLE_CHOICE"
+        questionType.contains("FILL") || questionType.contains("BLANK") -> "FILL_IN_THE_BLANK"
+        else -> "MULTIPLE_CHOICE"
+    }
+
+    return when (normalizedType) {
         "MULTIPLE_CHOICE" -> Question.MultipleChoice(
             id = id,
             text = text,
@@ -105,12 +118,11 @@ fun QuestionDto.toDomain(): Question {
     }
 }
 
-private fun String.toActivityType(): com.example.dialektapp.domain.model.ActivityType {
-    return when (this.uppercase()) {
-        "INTRODUCTION" -> com.example.dialektapp.domain.model.ActivityType.INTRODUCTION
-        "READING" -> com.example.dialektapp.domain.model.ActivityType.READING
-        "EXPLAINING" -> com.example.dialektapp.domain.model.ActivityType.EXPLAINING
-        "TEST" -> com.example.dialektapp.domain.model.ActivityType.TEST
-        else -> com.example.dialektapp.domain.model.ActivityType.INTRODUCTION
+private fun ActivityType.toDomainActivityType(): com.example.dialektapp.domain.model.ActivityType {
+    return when (this) {
+        ActivityType.INTRODUCTION -> com.example.dialektapp.domain.model.ActivityType.INTRODUCTION
+        ActivityType.READING -> com.example.dialektapp.domain.model.ActivityType.READING
+        ActivityType.EXPLAINING -> com.example.dialektapp.domain.model.ActivityType.EXPLAINING
+        ActivityType.TEST -> com.example.dialektapp.domain.model.ActivityType.TEST
     }
 }

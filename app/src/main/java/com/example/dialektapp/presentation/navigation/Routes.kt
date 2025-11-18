@@ -35,12 +35,14 @@ sealed class Routes {
 
     @Serializable
     data class ModuleLessons(
+        val courseId: String,
         val moduleId: String,
         val moduleTitle: String,
     ) : Routes()
 
     @Serializable
     data class Activity(
+        val courseId: String,
         val lessonId: String,
         val activityId: String,
     ) : Routes()

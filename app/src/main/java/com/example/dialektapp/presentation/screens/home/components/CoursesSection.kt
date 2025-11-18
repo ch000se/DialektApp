@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dialektapp.ui.theme.DialektAppTheme
 import com.example.dialektapp.R
-import com.example.dialektapp.domain.model.Course
 import com.example.dialektapp.ui.theme.*
+import com.example.dialektapp.domain.model.Course
 
 @Composable
 fun CoursesSection(
@@ -177,8 +177,9 @@ private fun CourseCard(
                         containerColor = HomeProgressBackground.copy(alpha = 0.95f)
                     )
                 ) {
-                    val progress = if (course.totalModules > 0) {
-                        (course.completedModules.toFloat() / course.totalModules.toFloat() * 100).toInt()
+                    val progress = if (course.getTotalActivities() > 0) {
+                        (course.getCompletedActivities().toFloat() / course.getTotalActivities()
+                            .toFloat() * 100).toInt()
                     } else 0
 
                     Text(
@@ -212,14 +213,15 @@ private fun CourseCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "${course.totalModules} модулів",
+                            text = "Модулів: ${course.modules.size}",
                             style = MaterialTheme.typography.bodySmall,
                             color = HomeCardTextWhite.copy(alpha = 0.9f),
                             fontSize = 12.sp
                         )
 
+                        val completedModules = course.modules.count { it.isCompleted }
                         Text(
-                            text = "${course.completedModules}/${course.totalModules}",
+                            text = "$completedModules/${course.modules.size}",
                             style = MaterialTheme.typography.bodySmall,
                             color = HomeCardTextWhite,
                             fontWeight = FontWeight.SemiBold,
@@ -229,8 +231,11 @@ private fun CourseCard(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    val progress = if (course.totalModules > 0) {
-                        course.completedModules.toFloat() / course.totalModules.toFloat()
+                    // Прогрес через модулі
+                    val completedModules = course.modules.count { it.isCompleted }
+                    val totalModules = course.modules.size
+                    val progress = if (totalModules > 0) {
+                        completedModules.toFloat() / totalModules.toFloat()
                     } else 0f
 
                     val animatedProgress by animateFloatAsState(
@@ -258,6 +263,22 @@ private fun CourseCard(
     }
 }
 
+private fun Course.getTotalActivities(): Int {
+    return modules.sumOf { module ->
+        module.lessons.sumOf { lesson ->
+            lesson.activities.size
+        }
+    }
+}
+
+private fun Course.getCompletedActivities(): Int {
+    return modules.sumOf { module ->
+        module.lessons.sumOf { lesson ->
+            lesson.activities.count { it.isCompleted }
+        }
+    }
+}
+
 @DrawableRes
 private fun getCourseImageResource(imageUrl: String): Int {
     return when (imageUrl) {
@@ -280,8 +301,7 @@ private fun CourseSectionPreview() {
                     description = "",
                     imageUrl = "zakarpatya",
                     imageUrlBack = "zakarpatya_back",
-                    totalModules = 12,
-                    completedModules = 5
+                    modules = emptyList()
                 ),
                 Course(
                     id = "galician",
@@ -289,8 +309,7 @@ private fun CourseSectionPreview() {
                     description = "",
                     imageUrl = "galychyna",
                     imageUrlBack = "galychyna_back",
-                    totalModules = 10,
-                    completedModules = 7
+                    modules = emptyList()
                 ),
                 Course(
                     id = "kuban",
@@ -298,8 +317,7 @@ private fun CourseSectionPreview() {
                     description = "",
                     imageUrl = "kuban",
                     imageUrlBack = "kuban_back",
-                    totalModules = 8,
-                    completedModules = 3
+                    modules = emptyList()
                 )
             ),
             isLoading = false,

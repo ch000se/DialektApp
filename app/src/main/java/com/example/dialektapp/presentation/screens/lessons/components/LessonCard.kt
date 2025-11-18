@@ -116,12 +116,19 @@ fun LessonCard(
             if (isExpanded && lesson.isUnlocked && lesson.activities.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(30.dp))
 
-                Row {
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // Колонка з кружками та лініями
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.width(24.dp)
                     ) {
                         lesson.activities.forEachIndexed { index, activity ->
+                            // Визначаємо чи це поточна активність (наступна після завершених)
+                            val isCurrentActivity = !activity.isCompleted &&
+                                    (index == 0 || lesson.activities[index - 1].isCompleted)
+
                             Box(
                                 modifier = Modifier
                                     .size(20.dp)
@@ -129,41 +136,57 @@ fun LessonCard(
                                     .background(CardBackground)
                                     .border(
                                         width = 2.dp,
-                                        color = if (activity.isCompleted) GreenAccent else GrayAccent,
+                                        color = when {
+                                            activity.isCompleted -> GreenAccent
+                                            isCurrentActivity -> GreenAccent
+                                            else -> GrayAccent
+                                        },
                                         shape = CircleShape
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
-                                if (activity.isCompleted) {
-                                    Icon(
-                                        Icons.Default.Check,
-                                        contentDescription = "Completed",
-                                        tint = GreenAccent,
-                                        modifier = Modifier.size(12.dp)
-                                    )
-                                } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(10.dp)
-                                            .clip(CircleShape)
-                                            .background(
-                                                if (activity.type == ActivityType.INTRODUCTION) GreenAccent
-                                                else GrayAccent
-                                            )
-                                    )
+                                when {
+                                    activity.isCompleted -> {
+                                        Icon(
+                                            Icons.Default.Check,
+                                            contentDescription = "Completed",
+                                            tint = GreenAccent,
+                                            modifier = Modifier.size(12.dp)
+                                        )
+                                    }
+                                    isCurrentActivity -> {
+                                        // Зелений заповнений кружок для поточної активності
+                                        Box(
+                                            modifier = Modifier
+                                                .size(10.dp)
+                                                .clip(CircleShape)
+                                                .background(GreenAccent)
+                                        )
+                                    }
+
+                                    else -> {
+                                        // Сірий кружок для майбутніх активностей
+                                        Box(
+                                            modifier = Modifier
+                                                .size(10.dp)
+                                                .clip(CircleShape)
+                                                .background(GrayAccent)
+                                        )
+                                    }
                                 }
                             }
 
+                            // Лінія до наступної активності (між кружками)
                             if (index < lesson.activities.size - 1) {
                                 Box(
                                     modifier = Modifier
                                         .width(2.dp)
                                         .height(30.dp)
                                         .background(
-                                            if (activity.isCompleted && lesson.activities[index + 1].isCompleted)
+                                            if (activity.isCompleted)
                                                 GreenAccent
                                             else
-                                                TextWhite
+                                                GrayAccent
                                         )
                                 )
                             }
@@ -172,6 +195,7 @@ fun LessonCard(
 
                     Spacer(modifier = Modifier.width(20.dp))
 
+                    // Колонка з текстом активностей
                     Column(
                         verticalArrangement = Arrangement.spacedBy(30.dp),
                         modifier = Modifier.weight(1f)
@@ -197,23 +221,44 @@ private fun ActivityItemExpanded(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .then(
+                if (activity.isUnlocked) {
+                    Modifier.clickable { onClick() }
+                } else {
+                    Modifier
+                }
+            ),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = activity.name,
-            style = MaterialTheme.typography.bodyLarge,
-            color = TextWhite,
-            fontWeight = FontWeight.Medium,
-            fontSize = 20.sp,
-            letterSpacing = 0.4.sp
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.weight(1f)
+        ) {
+            if (!activity.isUnlocked) {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "Locked",
+                    tint = GrayAccent,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
+            Text(
+                text = activity.name,
+                style = MaterialTheme.typography.bodyLarge,
+                color = if (activity.isUnlocked) TextWhite else GrayAccent,
+                fontWeight = FontWeight.Medium,
+                fontSize = 20.sp,
+                letterSpacing = 0.4.sp
+            )
+        }
 
         Text(
             text = activity.duration,
             style = MaterialTheme.typography.bodyMedium,
-            color = TextWhite,
+            color = if (activity.isUnlocked) TextWhite else GrayAccent,
             fontWeight = FontWeight.Light,
             fontSize = 18.sp
         )

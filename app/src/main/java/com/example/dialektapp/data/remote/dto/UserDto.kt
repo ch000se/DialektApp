@@ -2,6 +2,15 @@ package com.example.dialektapp.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
+enum class UserRole {
+    @SerializedName("user")
+    USER,
+    @SerializedName("admin")
+    ADMIN,
+    @SerializedName("manager")
+    MANAGER
+}
+
 data class UserDto(
     @SerializedName("id")
     val id: Int,
@@ -16,5 +25,5 @@ data class UserDto(
     @SerializedName("disabled")
     val disabled: Boolean,
     @SerializedName("role")
-    val role: String,
+    val role: UserRole,
 )

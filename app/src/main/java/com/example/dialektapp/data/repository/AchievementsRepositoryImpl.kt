@@ -25,16 +25,6 @@ class AchievementsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAchievement(achievementId: Int): Result<Achievement, NetworkError> {
-        Log.d("AchievementsRepo", "API call: GET /achievements/$achievementId")
-        return safeCall {
-            api.getAchievement(achievementId)
-        }.map {
-            Log.d("AchievementsRepo", "Received achievement: ${it.title}")
-            it.toDomain()
-        }
-    }
-
     override suspend fun unlockAchievement(achievementId: Int): Result<Achievement, NetworkError> {
         Log.d("AchievementsRepo", "API call: POST /achievements/$achievementId/unlock")
         return safeCall {

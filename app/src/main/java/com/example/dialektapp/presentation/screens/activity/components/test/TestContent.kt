@@ -35,6 +35,12 @@ fun TestContent(
             content = content,
             userAnswers = userAnswers,
             onComplete = onComplete,
+            onRetry = {
+                currentQuestionIndex = 0
+                userAnswers = emptyMap()
+                showResults = false
+                isAnswered = false
+            },
             modifier = modifier
         )
     } else if (currentQuestion != null) {

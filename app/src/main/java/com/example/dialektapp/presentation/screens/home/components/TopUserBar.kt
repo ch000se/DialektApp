@@ -35,7 +35,6 @@ import com.example.dialektapp.ui.theme.TextWhite
 @Composable
 fun TopUserBar(
     user: User?,
-    onProfileClick: () -> Unit = {},
     coinsCount: Int = 0,
 ) {
     var isVisible by remember { mutableStateOf(false) }

@@ -103,9 +103,10 @@ fun NavGraph(
                 onBackClick = {
                     navController.popBackStack()
                 },
-                onModuleClick = { moduleId ->
+                onModuleClick = { courseId, moduleId ->
                     navController.navigate(
                         Routes.ModuleLessons(
+                            courseId = courseId,
                             moduleId = moduleId,
                             moduleTitle = "Модуль $moduleId"
                         )
@@ -116,7 +117,9 @@ fun NavGraph(
 
         composable<Routes.ModuleLessons> { backStackEntry ->
             val moduleLessons = backStackEntry.toRoute<Routes.ModuleLessons>()
+
             ModuleLessonsScreen(
+                courseId = moduleLessons.courseId,
                 moduleId = moduleLessons.moduleId,
                 moduleTitle = moduleLessons.moduleTitle,
                 onBackClick = {
@@ -125,6 +128,7 @@ fun NavGraph(
                 onActivityClick = { lessonId, activityId ->
                     navController.navigate(
                         Routes.Activity(
+                            courseId = moduleLessons.courseId,
                             lessonId = lessonId,
                             activityId = activityId
                         )
@@ -169,6 +173,7 @@ fun NavGraph(
         composable<Routes.Activity> { backStackEntry ->
             val activity = backStackEntry.toRoute<Routes.Activity>()
             ActivityScreen(
+                courseId = activity.courseId,
                 lessonId = activity.lessonId,
                 activityId = activity.activityId,
                 onBackClick = {

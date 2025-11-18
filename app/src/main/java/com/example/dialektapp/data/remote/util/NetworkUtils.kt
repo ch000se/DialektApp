@@ -13,8 +13,12 @@ import java.net.UnknownHostException
 inline fun <reified T> responseToResult(response: Response<T>): Result<T, NetworkError> {
     return if (response.isSuccessful) {
         val body = response.body()
-        if (body != null) {
-            Result.Success(body)
+
+        // Для 204 No Content body завжди null, але це успіх
+        // Також для Unit типу body може бути null
+        if (body != null || response.code() == 204 || T::class == Unit::class) {
+            @Suppress("UNCHECKED_CAST")
+            Result.Success(body ?: Unit as T)
         } else {
             Result.Error(NetworkError.SERIALIZATION_ERROR)
         }

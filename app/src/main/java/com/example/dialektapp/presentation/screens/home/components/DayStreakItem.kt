@@ -56,8 +56,8 @@ fun DayStreakItem(
     val cardColor by animateColorAsState(
         targetValue = when {
             hasReward -> AccentGold
-            dayState == DayState.Completed -> AccentPrimary.copy(alpha = 0.6f)
-            dayState == DayState.Active -> AccentPrimary
+            dayState == DayState.Completed -> AccentPrimaryLight  // Світліший жовтий для завершених
+            dayState == DayState.Active -> AccentPrimary          // Яскравий жовтий для активного
             else -> StreakUpcomingTileColor
         },
         animationSpec = tween(500),
@@ -109,13 +109,6 @@ fun DayStreakItem(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(
-                        color = when (dayState) {
-                            DayState.Completed -> AccentPrimary.copy(alpha = 0.6f)
-                            else -> Color.Transparent
-                        },
-                        shape = RoundedCornerShape(TileCornerRadius)
-                    )
                     .padding(InnerPadding),
                 contentAlignment = Alignment.Center
             ) {
