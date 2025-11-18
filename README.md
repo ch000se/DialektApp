@@ -7,9 +7,13 @@ A modern **Android application** for learning Ukrainian dialects and language va
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.0-blue.svg?style=flat&logo=kotlin)](http://kotlinlang.org)
 [![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-2024.09.02-brightgreen)](https://developer.android.com/jetpack/compose)
 [![Hilt](https://img.shields.io/badge/Hilt-2.57.1-orange.svg?style=flat)](https://dagger.dev/hilt/)
+[![Status](https://img.shields.io/badge/Status-In%20Development-yellow.svg)](https://github.com/ch000se/DialektApp)
 [![License](https://img.shields.io/badge/License-Educational-yellow.svg)](LICENSE)
 
 </div>
+
+> ⚠️ **Project Status**: This application is currently under active development. Some features may
+> be incomplete or subject to change.
 
 ## ✨ Features
 
