@@ -34,25 +34,49 @@ A modern **Android application** for learning Ukrainian dialects and language va
 
 ### Authentication Flow
 
+<p float="left">
+  <img src="screenshots/login.png" width="250" alt="Login Screen"/>
+  <img src="screenshots/signup.png" width="250" alt="Sign Up Screen"/>
+</p>
+
 Sign in, sign up, or recover your password with a beautiful and intuitive interface.
 
 ---
 
-### Home Dashboard
+### Home Dashboard & Activity Tracking
 
-Access your courses, track your progress, and continue your learning journey.
+<p float="left">
+  <img src="screenshots/home.png" width="250" alt="Home Dashboard"/>
+  <img src="screenshots/leaderboard.png" width="250" alt="Leaderboard"/>
+  <img src="screenshots/achievements.png" width="250" alt="Achievements"/>
+</p>
+
+Access your courses, track your progress, and compete with other learners.
+
+---
+
+### Profile & Statistics
+
+<img src="screenshots/profile.png" width="250" alt="User Profile"/>
+
+View your profile, achievements, and learning statistics all in one place.
 
 ---
 
 ### Lessons & Activities
 
+<p float="left">
+  <img src="screenshots/module_complete.png" width="250" alt="Module Completion"/>
+  <img src="screenshots/lesson_list.png" width="250" alt="Lesson List"/>
+</p>
+
+<p float="left">
+  <img src="screenshots/lesson_intro.png" width="250" alt="Lesson Introduction"/>
+  <img src="screenshots/test_input.png" width="250" alt="Test with Input"/>
+  <img src="screenshots/test_quiz.png" width="250" alt="Test Quiz"/>
+</p>
+
 Interactive lessons with various activity types to enhance your learning experience.
-
----
-
-### Profile & Achievements
-
-View your profile, achievements, and learning statistics all in one place.
 
 </div>
 
