@@ -1,19 +1,23 @@
 package com.example.dialektapp.presentation.screens.auth.signup
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dialektapp.domain.usecases.RegisterUseCase
-import com.example.dialektapp.domain.usecases.ValidateSignUpUseCase
+import com.example.dialektapp.domain.usecases.auth.RegisterUseCase
+import com.example.dialektapp.domain.usecases.validation.ValidateSignUpUseCase
 import com.example.dialektapp.domain.util.ValidationResult
 import com.example.dialektapp.domain.util.onError
 import com.example.dialektapp.domain.util.onSuccess
 import com.example.dialektapp.presentation.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,11 +27,15 @@ class SignUpViewModel @Inject constructor(
     private val validateSignUp: ValidateSignUpUseCase,
 ) : ViewModel() {
 
-    private val _uiEvent = MutableSharedFlow<UiEvent>()
-    val uiEvent = _uiEvent.asSharedFlow()
+    // Використовуємо Channel замість SharedFlow для one-time events
+    private val _uiEvent = Channel<UiEvent>(Channel.BUFFERED)
+    val uiEvent = _uiEvent.receiveAsFlow()
 
     private val _signUpState = MutableStateFlow(SignUpState())
     val signUpState: StateFlow<SignUpState> = _signUpState.asStateFlow()
+
+    private val TAG = "SignUpViewModel"
+    private var registerJob: Job? = null
 
     fun updateUsername(username: String) {
         _signUpState.value = _signUpState.value.copy(username = username)
@@ -107,10 +115,13 @@ class SignUpViewModel @Inject constructor(
 
         if (validationResult is ValidationResult.Error) {
             processInputValidationType(validationResult)
+            Log.d(TAG, "Validation failed: ${validationResult.errors}")
             return
         }
 
-        viewModelScope.launch {
+        registerJob?.cancel() // Скасовуємо попередню реєстрацію якщо є
+        registerJob = viewModelScope.launch {
+            Log.d(TAG, "Starting registration for: ${_signUpState.value.username}")
             _signUpState.value = _signUpState.value.copy(isLoading = true)
 
             val result = registerUser(
@@ -123,15 +134,23 @@ class SignUpViewModel @Inject constructor(
             _signUpState.value = _signUpState.value.copy(isLoading = false)
 
             result.onSuccess {
+                Log.d(TAG, "Registration successful")
                 _signUpState.value = _signUpState.value.copy(isSuccess = true)
-                _uiEvent.emit(UiEvent.ShowSnackbar("Реєстрація успішна! Тепер ви можете увійти"))
-                _uiEvent.emit(UiEvent.Navigate)
+                _uiEvent.send(UiEvent.Navigate)
             }.onError { error ->
+                Log.e(TAG, "Registration error: $error")
                 _signUpState.value = _signUpState.value.copy(
                     errorMessageSignUpProcess = error
                 )
-                _uiEvent.emit(UiEvent.ShowErrorSnackbar(error))
+                _uiEvent.send(UiEvent.ShowErrorSnackbar(error))
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        registerJob?.cancel()
+        _uiEvent.close()
+        Log.d(TAG, "SignUpViewModel cleared, jobs cancelled")
     }
 }

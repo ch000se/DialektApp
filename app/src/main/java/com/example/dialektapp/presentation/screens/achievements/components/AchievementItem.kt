@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dialektapp.domain.model.Achievement
 import com.example.dialektapp.domain.model.AchievementRarity
+import com.example.dialektapp.ui.theme.*
 
 @Composable
 fun AchievementItem(
@@ -121,7 +122,7 @@ fun AchievementItem(
                 text = achievement.title,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = TextWhite,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
                 lineHeight = 16.sp
@@ -146,10 +147,10 @@ fun AchievementItem(
 @Composable
 private fun RarityBadge(rarity: AchievementRarity) {
     val (text, color) = when (rarity) {
-        AchievementRarity.COMMON -> "Звичайне" to Color(0xFF4CAF50)
-        AchievementRarity.RARE -> "Рідкісне" to Color(0xFF2196F3)
-        AchievementRarity.EPIC -> "Епічне" to Color(0xFF9C27B0)
-        AchievementRarity.LEGENDARY -> "Легендарне" to Color(0xFFFF9800)
+        AchievementRarity.COMMON -> "Звичайне" to RarityCommonPrimary
+        AchievementRarity.RARE -> "Рідкісне" to RarityRarePrimary
+        AchievementRarity.EPIC -> "Епічне" to RarityEpicPrimary
+        AchievementRarity.LEGENDARY -> "Легендарне" to RarityLegendaryPrimary
     }
 
     Surface(
@@ -160,7 +161,7 @@ private fun RarityBadge(rarity: AchievementRarity) {
             text = text,
             fontSize = 10.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = TextWhite,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
         )
     }
@@ -174,50 +175,50 @@ private fun getAchievementColors(
     return when {
         !isUnlocked -> AchievementColors(
             backgroundColors = listOf(
-                Color(0xFF424242),
-                Color(0xFF616161)
+                StateLockedPrimary,
+                StateLockedSecondary
             ),
-            borderColor = Color(0xFF757575)
+            borderColor = StateLockedBorder
         )
 
         rarity == AchievementRarity.COMMON -> AchievementColors(
             backgroundColors = listOf(
-                Color(0xFF66BB6A),
-                Color(0xFF81C784)
+                RarityCommonPrimary,
+                RarityCommonSecondary
             ),
-            borderColor = Color(0xFF4CAF50)
+            borderColor = RarityCommonBorder
         )
 
         rarity == AchievementRarity.RARE -> AchievementColors(
             backgroundColors = listOf(
-                Color(0xFF42A5F5),
-                Color(0xFF64B5F6)
+                RarityRarePrimary,
+                RarityRareSecondary
             ),
-            borderColor = Color(0xFF2196F3)
+            borderColor = RarityRareBorder
         )
 
         rarity == AchievementRarity.EPIC -> AchievementColors(
             backgroundColors = listOf(
-                Color(0xFFAB47BC),
-                Color(0xFFBA68C8)
+                RarityEpicPrimary,
+                RarityEpicSecondary
             ),
-            borderColor = Color(0xFF9C27B0)
+            borderColor = RarityEpicBorder
         )
 
         rarity == AchievementRarity.LEGENDARY -> AchievementColors(
             backgroundColors = listOf(
-                Color(0xFFFFB74D),
-                Color(0xFFFFA726)
+                RarityLegendaryPrimary,
+                RarityLegendarySecondary
             ),
-            borderColor = Color(0xFFFF9800)
+            borderColor = RarityLegendaryBorder
         )
 
         else -> AchievementColors(
             backgroundColors = listOf(
-                Color(0xFF66BB6A),
-                Color(0xFF81C784)
+                RarityCommonPrimary,
+                RarityCommonSecondary
             ),
-            borderColor = Color(0xFF4CAF50)
+            borderColor = RarityCommonBorder
         )
     }
 }

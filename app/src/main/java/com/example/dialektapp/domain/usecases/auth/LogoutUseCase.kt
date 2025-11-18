@@ -1,4 +1,4 @@
-package com.example.dialektapp.domain.usecases
+package com.example.dialektapp.domain.usecases.auth
 
 import com.example.dialektapp.domain.repository.AuthRepository
 import javax.inject.Inject

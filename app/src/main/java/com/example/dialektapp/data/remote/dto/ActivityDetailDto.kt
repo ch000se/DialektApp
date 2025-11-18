@@ -2,6 +2,7 @@ package com.example.dialektapp.data.remote.dto
 
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
+import com.example.dialektapp.data.remote.dto.ActivityType
 
 data class ActivityDetailDto(
     @SerializedName("activity_id")
@@ -12,7 +13,7 @@ data class ActivityDetailDto(
 
 data class ActivityContentDto(
     @SerializedName("type")
-    val type: String, // "INTRODUCTION", "READING", "EXPLAINING", "TEST"
+    val type: ActivityType,
     @SerializedName("title")
     val title: String?,
     @SerializedName("description")
@@ -56,8 +57,10 @@ data class ExampleDto(
 data class QuestionDto(
     @SerializedName("id")
     val id: String,
+    @SerializedName("kind")
+    val kind: String?,
     @SerializedName("type")
-    val type: String, // "MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANK"
+    val type: String?,
     @SerializedName("text")
     val text: String,
     @SerializedName("options")

@@ -24,6 +24,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.dialektapp.domain.model.Achievement
 import com.example.dialektapp.domain.model.AchievementRarity
+import com.example.dialektapp.ui.theme.*
 
 @Composable
 fun AchievementDetailDialog(
@@ -94,7 +95,7 @@ fun AchievementDetailDialog(
 
                     Text(
                         text = "Деталі досягнення",
-                        color = Color.White,
+                        color = TextWhite,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -158,7 +159,10 @@ fun AchievementDetailDialog(
                                         )
                                     } else {
                                         Brush.linearGradient(
-                                            colors = listOf(Color(0xFF9E9E9E), Color(0xFFBDBDBD))
+                                            colors = listOf(
+                                                StateLockedPrimary,
+                                                StateLockedSecondary
+                                            )
                                         )
                                     },
                                     shape = CircleShape
@@ -187,7 +191,7 @@ fun AchievementDetailDialog(
                         text = achievement.title,
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        color = TextWhite,
                         textAlign = TextAlign.Center
                     )
 
@@ -202,7 +206,7 @@ fun AchievementDetailDialog(
                         Text(
                             text = achievement.description,
                             fontSize = 16.sp,
-                            color = Color.White,
+                            color = TextWhite,
                             textAlign = TextAlign.Center,
                             lineHeight = 24.sp,
                             modifier = Modifier.padding(24.dp)
@@ -218,7 +222,7 @@ fun AchievementDetailDialog(
                                 .fillMaxWidth()
                                 .height(64.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFD1F501)
+                                containerColor = AccentPrimary
                             ),
                             shape = RoundedCornerShape(32.dp),
                             elevation = ButtonDefaults.buttonElevation(
@@ -245,10 +249,10 @@ fun AchievementDetailDialog(
 @Composable
 private fun RarityChip(rarity: AchievementRarity) {
     val (text, colors) = when (rarity) {
-        AchievementRarity.COMMON -> "ЗВИЧАЙНЕ" to listOf(Color(0xFF66BB6A), Color(0xFF81C784))
-        AchievementRarity.RARE -> "РІДКІСНЕ" to listOf(Color(0xFF42A5F5), Color(0xFF64B5F6))
-        AchievementRarity.EPIC -> "ЕПІЧНЕ" to listOf(Color(0xFFAB47BC), Color(0xFFBA68C8))
-        AchievementRarity.LEGENDARY -> "ЛЕГЕНДАРНЕ" to listOf(Color(0xFFFFB74D), Color(0xFFFFA726))
+        AchievementRarity.COMMON -> "ЗВИЧАЙНЕ" to listOf(RarityCommonPrimary, RarityCommonSecondary)
+        AchievementRarity.RARE -> "РІДКІСНЕ" to listOf(RarityRarePrimary, RarityRareSecondary)
+        AchievementRarity.EPIC -> "ЕПІЧНЕ" to listOf(RarityEpicPrimary, RarityEpicSecondary)
+        AchievementRarity.LEGENDARY -> "ЛЕГЕНДАРНЕ" to listOf(RarityLegendaryPrimary, RarityLegendarySecondary)
     }
 
     Surface(
@@ -273,7 +277,7 @@ private fun RarityChip(rarity: AchievementRarity) {
                 text = text,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = TextWhite
             )
         }
     }
@@ -282,44 +286,44 @@ private fun RarityChip(rarity: AchievementRarity) {
 private fun getDialogGradient(rarity: AchievementRarity, isUnlocked: Boolean): List<Color> {
     if (!isUnlocked) {
         return listOf(
-            Color(0xFF424242),
-            Color(0xFF616161),
-            Color(0xFF757575)
+            StateLockedPrimary,
+            StateLockedSecondary,
+            StateLockedBorder
         )
     }
 
     return when (rarity) {
         AchievementRarity.COMMON -> listOf(
-            Color(0xFF388E3C),
-            Color(0xFF4CAF50),
-            Color(0xFF66BB6A)
+            GradientAchievementCommonStart,
+            GradientAchievementCommonMiddle,
+            GradientAchievementCommonEnd
         )
 
         AchievementRarity.RARE -> listOf(
-            Color(0xFF1976D2),
-            Color(0xFF2196F3),
-            Color(0xFF42A5F5)
+            GradientAchievementRareStart,
+            GradientAchievementRareMiddle,
+            GradientAchievementRareEnd
         )
 
         AchievementRarity.EPIC -> listOf(
-            Color(0xFF7B1FA2),
-            Color(0xFF9C27B0),
-            Color(0xFFAB47BC)
+            GradientAchievementEpicStart,
+            GradientAchievementEpicMiddle,
+            GradientAchievementEpicEnd
         )
 
         AchievementRarity.LEGENDARY -> listOf(
-            Color(0xFFF57C00),
-            Color(0xFFFF9800),
-            Color(0xFFFFB74D)
+            GradientAchievementLegendaryStart,
+            GradientAchievementLegendaryMiddle,
+            GradientAchievementLegendaryEnd
         )
     }
 }
 
 private fun getRarityColors(rarity: AchievementRarity): List<Color> {
     return when (rarity) {
-        AchievementRarity.COMMON -> listOf(Color(0xFF66BB6A), Color(0xFF81C784))
-        AchievementRarity.RARE -> listOf(Color(0xFF42A5F5), Color(0xFF64B5F6))
-        AchievementRarity.EPIC -> listOf(Color(0xFFAB47BC), Color(0xFFBA68C8))
-        AchievementRarity.LEGENDARY -> listOf(Color(0xFFFFB74D), Color(0xFFFFA726))
+        AchievementRarity.COMMON -> listOf(RarityCommonPrimary, RarityCommonSecondary)
+        AchievementRarity.RARE -> listOf(RarityRarePrimary, RarityRareSecondary)
+        AchievementRarity.EPIC -> listOf(RarityEpicPrimary, RarityEpicSecondary)
+        AchievementRarity.LEGENDARY -> listOf(RarityLegendaryPrimary, RarityLegendarySecondary)
     }
 }

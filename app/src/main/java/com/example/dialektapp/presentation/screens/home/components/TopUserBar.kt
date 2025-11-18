@@ -30,12 +30,11 @@ import com.example.dialektapp.domain.model.User
 import com.example.dialektapp.presentation.components.UserAvatar
 import com.example.dialektapp.ui.theme.DialektAppTheme
 import com.example.dialektapp.ui.theme.HomeAvatarBackgroundGray
-import com.example.dialektapp.ui.theme.TextPrimaryDark
+import com.example.dialektapp.ui.theme.TextWhite
 
 @Composable
 fun TopUserBar(
     user: User?,
-    onProfileClick: () -> Unit = {},
     coinsCount: Int = 0,
 ) {
     var isVisible by remember { mutableStateOf(false) }
@@ -96,7 +95,7 @@ fun TopUserBar(
                     text = user?.fullName ?: "Loading...",
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
-                    color = TextPrimaryDark
+                    color = TextWhite
                 )
             }
 
@@ -117,7 +116,7 @@ fun TopUserBar(
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.coins),
                         contentDescription = null,
-                        tint = TextPrimaryDark,
+                        tint = TextWhite,
                         modifier = Modifier.size(18.dp)
                     )
 
@@ -134,7 +133,7 @@ fun TopUserBar(
                     Text(
                         text = "$animatedCoins",
                         fontSize = 18.sp,
-                        color = TextPrimaryDark,
+                        color = TextWhite,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(start = 4.dp)
                     )

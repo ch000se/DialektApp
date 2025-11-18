@@ -30,12 +30,12 @@ object AppGradients {
 
     // Success gradient
     val successGradient = Brush.verticalGradient(
-        colors = listOf(Success.copy(alpha = 0.8f), Success)
+        colors = listOf(StateSuccess.copy(alpha = 0.8f), StateSuccess)
     )
 
     // Error gradient
     val errorGradient = Brush.verticalGradient(
-        colors = listOf(Error.copy(alpha = 0.8f), Error)
+        colors = listOf(StateError.copy(alpha = 0.8f), StateError)
     )
 
     // Card overlay gradient

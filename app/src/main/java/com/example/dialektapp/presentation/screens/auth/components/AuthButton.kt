@@ -22,8 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dialektapp.ui.theme.AccentBlue
 import com.example.dialektapp.ui.theme.AuthContentWhite
-import com.example.dialektapp.ui.theme.Primary
 
 @Composable
 fun AuthButton(
@@ -53,9 +53,9 @@ fun AuthButton(
         shape = RoundedCornerShape(16.dp),
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
-            containerColor = Primary,
+            containerColor = AccentBlue,
             contentColor = AuthContentWhite,
-            disabledContainerColor = Primary.copy(alpha = 0.6f),
+            disabledContainerColor = AccentBlue.copy(alpha = 0.6f),
             disabledContentColor = AuthContentWhite.copy(alpha = 0.6f)
         ),
         elevation = ButtonDefaults.buttonElevation(

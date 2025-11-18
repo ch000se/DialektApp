@@ -22,6 +22,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -36,11 +37,10 @@ import com.example.dialektapp.presentation.screens.auth.login.components.TopLogi
 import com.example.dialektapp.presentation.util.UiEvent
 import com.example.dialektapp.presentation.util.toUserMessage
 import com.example.dialektapp.ui.theme.AppGradients
-import com.example.dialektapp.ui.theme.BackColor
+import com.example.dialektapp.ui.theme.BackgroundDeepBlue
 import com.example.dialektapp.ui.theme.GradientEnd
 import com.example.dialektapp.ui.theme.GradientMiddle
 import com.example.dialektapp.ui.theme.GradientStart
-import com.example.dialektapp.ui.theme.Primary
 import kotlinx.coroutines.launch
 
 
@@ -68,7 +68,7 @@ fun LoginScreen(
         }
     }
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is UiEvent.ShowSnackbar -> {
@@ -96,7 +96,7 @@ fun LoginScreen(
         modifier = modifier
             .fillMaxSize()
             .background(
-                color = BackColor
+                color = BackgroundDeepBlue
             )
             .padding(contentPadding),
         horizontalAlignment = Alignment.CenterHorizontally,

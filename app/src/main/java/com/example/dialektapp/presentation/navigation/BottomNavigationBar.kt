@@ -71,11 +71,11 @@ fun BottomNavigationBar(
                 selected = isSelected,
                 onClick = item.onClick,
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Primary,
-                    selectedTextColor = Primary,
+                    selectedIconColor = AccentBlue,
+                    selectedTextColor = AccentBlue,
                     unselectedIconColor = TextSecondaryDark,
                     unselectedTextColor = TextSecondaryDark,
-                    indicatorColor = LightPrimary.copy(alpha = 0.12f)
+                    indicatorColor = AccentBlue.copy(alpha = 0.12f)
                 )
             )
         }

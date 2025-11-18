@@ -21,9 +21,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.dialektapp.domain.util.ValidationError
 import com.example.dialektapp.presentation.util.toUserMessage
+import com.example.dialektapp.ui.theme.AccentBlue
 import com.example.dialektapp.ui.theme.AuthErrorRed
 import com.example.dialektapp.ui.theme.BorderColor
-import com.example.dialektapp.ui.theme.Primary
 import com.example.dialektapp.ui.theme.TextSecondary
 
 @Composable
@@ -57,13 +57,13 @@ fun EmailField(
             isError = firstEmailError != null,
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = if (firstEmailError != null) AuthErrorRed else Primary,
+                focusedBorderColor = if (firstEmailError != null) AuthErrorRed else AccentBlue,
                 unfocusedBorderColor = if (firstEmailError != null) AuthErrorRed else BorderColor,
-                focusedLabelColor = if (firstEmailError != null) AuthErrorRed else Primary,
+                focusedLabelColor = if (firstEmailError != null) AuthErrorRed else AccentBlue,
                 unfocusedLabelColor = if (firstEmailError != null) AuthErrorRed else TextSecondary,
-                focusedTextColor = if (firstEmailError != null) AuthErrorRed else Primary,
+                focusedTextColor = if (firstEmailError != null) AuthErrorRed else AccentBlue,
                 unfocusedTextColor = if (firstEmailError != null) AuthErrorRed else TextSecondary,
-                focusedLeadingIconColor = if (firstEmailError != null) AuthErrorRed else Primary,
+                focusedLeadingIconColor = if (firstEmailError != null) AuthErrorRed else AccentBlue,
                 unfocusedLeadingIconColor = if (firstEmailError != null) AuthErrorRed else TextSecondary,
                 errorBorderColor = AuthErrorRed,
                 errorLabelColor = AuthErrorRed,

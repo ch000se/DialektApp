@@ -29,6 +29,7 @@ fun TestResultsScreen(
     content: ActivityContent.Test,
     userAnswers: Map<String, String>,
     onComplete: (Int) -> Unit,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val correctAnswers = content.questions.count { question ->
@@ -88,7 +89,13 @@ fun TestResultsScreen(
         item {
             Spacer(modifier = Modifier.height(20.dp))
             Button(
-                onClick = { onComplete(score) },
+                onClick = {
+                    if (passed) {
+                        onComplete(score)
+                    } else {
+                        onRetry()
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (passed) GreenAccent else RedAccent,

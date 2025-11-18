@@ -5,8 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +43,18 @@ class MainActivity : ComponentActivity() {
                 var prefilledUsername by remember { mutableStateOf("") }
                 var prefilledPassword by remember { mutableStateOf("") }
 
-                Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { paddingValues ->
+                Scaffold(snackbarHost = {
+                    SnackbarHost(
+                        hostState = snackbarHostState,
+                        snackbar = { snackbarData ->
+                            Snackbar(
+                                snackbarData = snackbarData,
+                                containerColor = Color.White,
+                                contentColor = Color.Black
+                            )
+                        }
+                    )
+                }) { paddingValues ->
                     NavGraph(
                         navController = navController,
                         loginScreenContent = {

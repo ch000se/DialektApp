@@ -8,6 +8,7 @@ data class Course(
     val imageUrlBack: String,
     val totalModules: Int = 0,
     val completedModules: Int = 0,
+    val isUnlocked: Boolean = true,
     val modules: List<CourseModule> = emptyList()
 )
 

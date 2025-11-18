@@ -24,8 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.dialektapp.domain.util.ValidationError
 import com.example.dialektapp.presentation.util.toUserMessage
+import com.example.dialektapp.ui.theme.AccentBlue
 import com.example.dialektapp.ui.theme.AuthErrorRed
-import com.example.dialektapp.ui.theme.Primary
 import com.example.dialektapp.ui.theme.TextPrimary
 import com.example.dialektapp.ui.theme.TextSecondary
 
@@ -72,7 +72,7 @@ fun TermsAndConditions(
             Text(
                 text = "Умовами використання",
                 style = MaterialTheme.typography.bodySmall.copy(
-                    color = Primary,
+                    color = AccentBlue,
                     fontWeight = FontWeight.Medium,
                     textDecoration = TextDecoration.Underline
                 ),
@@ -87,7 +87,7 @@ fun TermsAndConditions(
             Text(
                 text = "Політикою конфіденційності",
                 style = MaterialTheme.typography.bodySmall.copy(
-                    color = Primary,
+                    color = AccentBlue,
                     fontWeight = FontWeight.Medium,
                     textDecoration = TextDecoration.Underline
                 ),

@@ -6,11 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dialektapp.domain.model.CourseModule
 import com.example.dialektapp.domain.model.Lesson
-import com.example.dialektapp.domain.repository.CoursesRepository
+import com.example.dialektapp.domain.usecases.courses.GetModuleWithLessonsUseCase
 import com.example.dialektapp.domain.util.NetworkError
 import com.example.dialektapp.domain.util.onError
 import com.example.dialektapp.domain.util.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,31 +27,42 @@ data class ModuleLessonsUiState(
     val error: NetworkError? = null
 )
 
+/**
+ * ViewModel для відображення уроків модуля
+ *
+ * Завантажує модуль разом з усіма уроками через API курсів.
+ * API повертає повну структуру курсу, з якої витягується потрібний модуль.
+ */
 @HiltViewModel
 class ModuleLessonsViewModel @Inject constructor(
-    private val coursesRepository: CoursesRepository,
+    private val getModuleWithLessonsUseCase: GetModuleWithLessonsUseCase,
+    private val coursesRepository: com.example.dialektapp.domain.repository.CoursesRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    private val courseId: String = savedStateHandle.get<String>("courseId") ?: ""
     private val moduleId: String = savedStateHandle.get<String>("moduleId") ?: ""
 
     private val _uiState = MutableStateFlow(ModuleLessonsUiState(isLoading = true))
     val uiState: StateFlow<ModuleLessonsUiState> = _uiState.asStateFlow()
 
+    private val TAG = "ModuleLessonsVM"
+    private var loadJob: Job? = null
+
     init {
-        Log.d("ModuleLessonsVM", "Initialized with moduleId: $moduleId")
+        Log.d(TAG, "Initialized with courseId: $courseId, moduleId: $moduleId")
         loadModuleData()
     }
 
     private fun loadModuleData() {
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            Log.d("ModuleLessonsVM", "Loading module data for moduleId: $moduleId")
+            Log.d(TAG, "Loading module data for courseId: $courseId, moduleId: $moduleId")
 
-            // Спробуємо отримати ID як Int
-            val moduleIdInt = moduleId.toIntOrNull()
-            if (moduleIdInt == null) {
-                Log.e("ModuleLessonsVM", "Invalid moduleId: $moduleId")
+            val courseIdInt = courseId.toIntOrNull()
+            if (courseIdInt == null) {
+                Log.e(TAG, "Invalid courseId: $courseId")
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -60,17 +72,28 @@ class ModuleLessonsViewModel @Inject constructor(
                 return@launch
             }
 
-            // Завантажуємо деталі модуля
-            coursesRepository.getModule(moduleIdInt)
+            // Завантажуємо модуль з курсу (модуль вже містить всі уроки)
+            getModuleWithLessonsUseCase(courseIdInt, moduleId)
                 .onSuccess { module ->
-                    Log.d("ModuleLessonsVM", "Module loaded: ${module.title}")
-                    _uiState.update { it.copy(module = module) }
+                    Log.d(TAG, "Module loaded: ${module.title} with ${module.lessons.size} lessons")
+                    module.lessons.forEachIndexed { index, lesson ->
+                        Log.d(
+                            TAG,
+                            "  $index. ${lesson.title} (${lesson.completedActivities}/${lesson.totalActivities} activities, unlocked: ${lesson.isUnlocked})"
+                        )
+                    }
 
-                    // Після успішного завантаження модуля, завантажуємо уроки
-                    loadLessons(moduleIdInt)
+                    _uiState.update {
+                        it.copy(
+                            module = module,
+                            lessons = module.lessons,
+                            isLoading = false,
+                            error = null
+                        )
+                    }
                 }
                 .onError { error ->
-                    Log.e("ModuleLessonsVM", "Failed to load module: $error")
+                    Log.e(TAG, "Failed to load module: $error")
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -79,37 +102,6 @@ class ModuleLessonsViewModel @Inject constructor(
                     }
                 }
         }
-    }
-
-    private suspend fun loadLessons(moduleId: Int) {
-        Log.d("ModuleLessonsVM", "Loading lessons for module: $moduleId")
-
-        coursesRepository.getModuleLessons(moduleId)
-            .onSuccess { lessons ->
-                Log.d("ModuleLessonsVM", "Lessons loaded: ${lessons.size} lessons")
-                lessons.forEachIndexed { index, lesson ->
-                    Log.d(
-                        "ModuleLessonsVM",
-                        "  $index. ${lesson.title} (${lesson.completedActivities}/${lesson.totalActivities} activities, unlocked: ${lesson.isUnlocked})"
-                    )
-                }
-                _uiState.update {
-                    it.copy(
-                        lessons = lessons,
-                        isLoading = false,
-                        error = null
-                    )
-                }
-            }
-            .onError { error ->
-                Log.e("ModuleLessonsVM", "Failed to load lessons: $error")
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = error
-                    )
-                }
-            }
     }
 
     fun toggleLessonExpansion(lessonId: String) {
@@ -121,7 +113,19 @@ class ModuleLessonsViewModel @Inject constructor(
     }
 
     fun retry() {
-        Log.d("ModuleLessonsVM", "Retrying to load module data")
+        Log.d(TAG, "Retrying to load module data")
         loadModuleData()
+    }
+
+    fun refresh() {
+        Log.d(TAG, "Refreshing module data")
+        // Завжди перезавантажуємо повні дані через правильний endpoint
+        loadModuleData()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        loadJob?.cancel()
+        Log.d(TAG, "ModuleLessonsViewModel cleared, jobs cancelled")
     }
 }

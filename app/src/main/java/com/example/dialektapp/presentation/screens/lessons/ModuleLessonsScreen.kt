@@ -12,16 +12,52 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.dialektapp.presentation.screens.lessons.components.*
+import kotlinx.coroutines.launch
 
 private val BackgroundDark = Color(0xFF15161A)
 private val CardBackground = Color(0xFF1F2025)
 private val TextWhite = Color.White
 
+/**
+ * Розраховує загальний час з усіх активностей модуля
+ * @param lessons список уроків модуля
+ * @return відформатований рядок типу "0h 15m"
+ */
+private fun calculateTotalDuration(lessons: List<com.example.dialektapp.domain.model.Lesson>): String {
+    var totalMinutes = 0
+
+    lessons.forEach { lesson ->
+        lesson.activities.forEach { activity ->
+            // Парсимо duration типу "5:00" або "2:00"
+            val parts = activity.duration.split(":")
+            if (parts.size == 2) {
+                val minutes = parts[0].toIntOrNull() ?: 0
+                val seconds = parts[1].toIntOrNull() ?: 0
+                totalMinutes += minutes
+                // Округлюємо секунди до хвилин якщо >= 30 секунд
+                if (seconds >= 30) {
+                    totalMinutes += 1
+                }
+            }
+        }
+    }
+
+    val hours = totalMinutes / 60
+    val minutes = totalMinutes % 60
+
+    return if (hours > 0) {
+        "${hours}h ${minutes}m"
+    } else {
+        "${minutes}m"
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModuleLessonsScreen(
+    courseId: String,
     moduleId: String,
     moduleTitle: String,
     moduleSubtitle: String = "Вітання та знайомство",
@@ -31,6 +67,11 @@ fun ModuleLessonsScreen(
     viewModel: ModuleLessonsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    // Перезавантажуємо дані кожен раз коли повертаємось на цей екран
+    LaunchedEffect(Unit) {
+        viewModel.refresh()
+    }
 
     Scaffold(
         topBar = {
@@ -113,7 +154,7 @@ fun ModuleLessonsScreen(
                             title = uiState.module?.title ?: moduleTitle,
                             subtitle = uiState.module?.subtitle ?: moduleSubtitle,
                             description = uiState.module?.description ?: moduleDescription,
-                            duration = "0h 0m" // TODO: додати duration в CourseModule
+                            duration = calculateTotalDuration(uiState.lessons)
                         )
                     }
 

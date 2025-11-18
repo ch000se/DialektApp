@@ -5,9 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dialektapp.domain.model.LeaderboardData
 import com.example.dialektapp.domain.model.LeaderboardPeriod
-import com.example.dialektapp.domain.repository.LeaderboardRepository
+import com.example.dialektapp.domain.usecases.leaderboard.GetLeaderboardUseCase
 import com.example.dialektapp.domain.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -23,24 +24,26 @@ data class LeaderboardUiState(
 
 @HiltViewModel
 class LeaderboardViewModel @Inject constructor(
-    private val leaderboardRepository: LeaderboardRepository
+    private val getLeaderboardUseCase: GetLeaderboardUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LeaderboardUiState())
     val uiState = _uiState.asStateFlow()
 
     private val TAG = "LeaderboardViewModel"
+    private var loadJob: Job? = null
 
     init {
         loadLeaderboard(LeaderboardPeriod.ALL_TIME)
     }
 
     fun loadLeaderboard(period: LeaderboardPeriod) {
-        viewModelScope.launch {
+        loadJob?.cancel() // Скасовуємо попереднє завантаження
+        loadJob = viewModelScope.launch {
             Log.d(TAG, "Loading leaderboard for period: $period")
             _uiState.update { it.copy(isLoading = true, error = null, selectedPeriod = period) }
 
-            when (val result = leaderboardRepository.getLeaderboard(period)) {
+            when (val result = getLeaderboardUseCase(period)) {
                 is Result.Success -> {
                     Log.d(TAG, "Leaderboard loaded: ${result.data.topEntries.size} entries")
                     result.data.currentUserEntry?.let {
@@ -107,5 +110,11 @@ class LeaderboardViewModel @Inject constructor(
             com.example.dialektapp.domain.util.NetworkError.NONE ->
                 "Помилка"
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        loadJob?.cancel()
+        Log.d(TAG, "LeaderboardViewModel cleared, jobs cancelled")
     }
 }

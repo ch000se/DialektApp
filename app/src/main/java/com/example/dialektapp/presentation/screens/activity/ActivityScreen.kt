@@ -8,18 +8,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.dialektapp.domain.model.ActivityContent
-import com.example.dialektapp.domain.model.ActivityDetail
-import com.example.dialektapp.domain.model.ActivityType
-import com.example.dialektapp.domain.model.LessonActivity
 import com.example.dialektapp.presentation.screens.activity.components.explaining.ExplainingContent
 import com.example.dialektapp.presentation.screens.activity.components.introduction.IntroductionContent
 import com.example.dialektapp.presentation.screens.activity.components.reading.ReadingContent
 import com.example.dialektapp.presentation.screens.activity.components.test.TestContent
+import com.example.dialektapp.presentation.screens.activity.components.RewardDialog
 
 private val BackgroundDark = Color(0xFF15161A)
 private val CardBackground = Color(0xFF1F2025)
@@ -28,23 +25,30 @@ private val TextWhite = Color.White
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityScreen(
+    courseId: String,
     lessonId: String,
     activityId: String,
     onBackClick: () -> Unit,
     onActivityComplete: () -> Unit = {},
     viewModel: ActivityViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(activityId) {
-        viewModel.loadActivity(activityId)
+    LaunchedEffect(courseId, activityId, lessonId) {
+        viewModel.loadActivity(activityId, lessonId, courseId)
     }
 
-    LaunchedEffect(uiState.isCompleted) {
-        if (uiState.isCompleted) {
-            onActivityComplete()
-        }
+    // Показуємо діалог з нагородою
+    val coinsEarned = uiState.coinsEarned
+    if (uiState.showRewardDialog && coinsEarned != null) {
+        RewardDialog(
+            coins = coinsEarned,
+            onDismiss = {
+                viewModel.dismissRewardDialog()
+                // Повертаємось назад ТІЛЬКИ після закриття діалогу
+                onActivityComplete()
+            }
+        )
     }
 
     Scaffold(

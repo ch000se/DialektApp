@@ -8,7 +8,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
-import com.example.dialektapp.ui.theme.Primary
+import com.example.dialektapp.ui.theme.AccentBlue
 import com.example.dialektapp.ui.theme.TextPrimary
 import com.example.dialektapp.ui.theme.TextSecondary
 
@@ -30,7 +30,7 @@ fun SignUpLink(
         ) {
             Text(
                 text = "Зареєструватися",
-                color = Primary,
+                color = AccentBlue,
                 fontWeight = FontWeight.Bold
             )
         }

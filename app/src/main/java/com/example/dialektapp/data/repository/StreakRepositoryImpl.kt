@@ -2,8 +2,8 @@ package com.example.dialektapp.data.repository
 
 import android.util.Log
 import com.example.dialektapp.data.mappers.toDomain
-import com.example.dialektapp.data.remote.StreakApi
-import com.example.dialektapp.data.remote.safeCall
+import com.example.dialektapp.data.remote.api.StreakApi
+import com.example.dialektapp.data.remote.util.safeCall
 import com.example.dialektapp.domain.model.DailyStreakData
 import com.example.dialektapp.domain.repository.StreakRepository
 import com.example.dialektapp.domain.util.NetworkError

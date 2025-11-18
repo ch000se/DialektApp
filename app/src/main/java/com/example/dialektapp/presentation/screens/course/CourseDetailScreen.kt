@@ -15,11 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.dialektapp.R
 import com.example.dialektapp.presentation.screens.course.components.*
 import com.example.dialektapp.ui.theme.*
@@ -38,7 +37,7 @@ fun CourseDetailScreen(
     courseId: String,
     courseName: String,
     onBackClick: () -> Unit,
-    onModuleClick: (String) -> Unit,
+    onModuleClick: (courseId: String, moduleId: String) -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: CourseDetailViewModel = hiltViewModel()
 ) {
@@ -58,8 +57,8 @@ fun CourseDetailScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            BackColor.copy(alpha = 0.7f),
-                            BackColor.copy(alpha = 0.9f)
+                            BackgroundDeepBlue.copy(alpha = 0.7f),
+                            BackgroundDeepBlue.copy(alpha = 0.9f)
                         )
                     )
                 )
@@ -97,7 +96,7 @@ fun CourseDetailScreen(
                     uiState.isLoading -> {
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.Center),
-                            color = Primary
+                            color = AccentBlue
                         )
                     }
 
@@ -117,7 +116,7 @@ fun CourseDetailScreen(
                             Button(
                                 onClick = { viewModel.retry() },
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Primary,
+                                    containerColor = AccentBlue,
                                     contentColor = Color.Black
                                 )
                             ) {
@@ -146,7 +145,7 @@ fun CourseDetailScreen(
                                         viewModel.toggleModuleExpansion(module.id)
                                     },
                                     onLessonClick = {
-                                        onModuleClick(module.id)
+                                        onModuleClick(courseId, module.id)
                                     }
                                 )
                             }

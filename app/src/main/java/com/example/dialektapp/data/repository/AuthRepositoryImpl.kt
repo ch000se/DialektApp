@@ -1,10 +1,11 @@
 package com.example.dialektapp.data.repository
 
+import android.util.Log
+import com.example.dialektapp.data.local.TokenManager
 import com.example.dialektapp.data.mappers.toDomain
-import com.example.dialektapp.data.remote.AuthApi
-import com.example.dialektapp.data.remote.TokenManager
+import com.example.dialektapp.data.remote.api.AuthApi
 import com.example.dialektapp.data.remote.dto.RegisterRequest
-import com.example.dialektapp.data.remote.safeCall
+import com.example.dialektapp.data.remote.util.safeCall
 import com.example.dialektapp.domain.model.User
 import com.example.dialektapp.domain.repository.AuthRepository
 import com.example.dialektapp.domain.util.NetworkError

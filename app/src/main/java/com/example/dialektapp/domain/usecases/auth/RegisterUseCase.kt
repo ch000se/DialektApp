@@ -1,4 +1,4 @@
-package com.example.dialektapp.domain.usecases
+package com.example.dialektapp.domain.usecases.auth
 
 import com.example.dialektapp.domain.model.User
 import com.example.dialektapp.domain.repository.AuthRepository

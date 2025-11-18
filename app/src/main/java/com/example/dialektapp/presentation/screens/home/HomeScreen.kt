@@ -15,8 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.dialektapp.presentation.screens.home.components.*
-import com.example.dialektapp.presentation.screens.home.viewmodel.HomeViewModel
-import com.example.dialektapp.ui.theme.BackColor
+import com.example.dialektapp.ui.theme.BackgroundDeepBlue
 import com.example.dialektapp.ui.theme.HomeSurfaceColor
 import com.example.dialektapp.ui.theme.LeaderboardListCardBackground
 import com.example.dialektapp.ui.theme.LeaderboardListCardSecondaryBackground
@@ -24,6 +23,7 @@ import com.example.dialektapp.ui.theme.LeaderboardListOverlayBottom
 import com.example.dialektapp.ui.theme.LeaderboardListOverlayEnd
 import com.example.dialektapp.ui.theme.LeaderboardListOverlayMiddle
 import com.example.dialektapp.ui.theme.LeaderboardListOverlayStart
+import com.example.dialektapp.presentation.screens.home.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,17 +39,26 @@ fun HomeScreen(
     val courses by viewModel.courses.collectAsStateWithLifecycle()
     val isLoadingCourses by viewModel.isLoadingCourses.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        isVisible = true
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshData()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackColor)
+            .background(BackgroundDeepBlue)
     ) {
         AnimatedVisibility(
-            visible = isVisible,
+            visible = true,
             enter = slideInVertically(
                 animationSpec = tween(600, delayMillis = 100),
                 initialOffsetY = { -it / 2 }
@@ -63,7 +72,6 @@ fun HomeScreen(
             ) {
                 TopUserBar(
                     user = user,
-                    onProfileClick = onProfileClick,
                     coinsCount = stats.totalCoins
                 )
 
@@ -72,7 +80,7 @@ fun HomeScreen(
         }
 
         AnimatedVisibility(
-            visible = isVisible,
+            visible = true,
             enter = slideInVertically(
                 animationSpec = tween(800, delayMillis = 200),
                 initialOffsetY = { it / 2 }

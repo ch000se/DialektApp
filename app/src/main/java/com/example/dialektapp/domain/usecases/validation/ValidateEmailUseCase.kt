@@ -1,4 +1,4 @@
-package com.example.dialektapp.domain.usecases
+package com.example.dialektapp.domain.usecases.validation
 
 import android.util.Patterns
 import com.example.dialektapp.domain.util.ValidationError

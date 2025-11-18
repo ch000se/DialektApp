@@ -27,7 +27,6 @@ fun ModuleInfoCard(
     subtitle: String,
     description: String,
     duration: String,
-    onGoToLessonsClick: () -> Unit = {},
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -99,14 +98,6 @@ fun ModuleInfoCard(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal
                 )
-            }
-            Button(
-                onClick = onGoToLessonsClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-            ) {
-                Text("Go to lessons")
             }
         }
     }

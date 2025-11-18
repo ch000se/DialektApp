@@ -1,5 +1,6 @@
 package com.example.dialektapp.presentation.screens.home.components
 
+import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
@@ -24,10 +25,11 @@ import androidx.compose.ui.unit.sp
 import com.example.dialektapp.R
 import com.example.dialektapp.domain.model.DailyStreakData
 import com.example.dialektapp.domain.model.DayState
-import com.example.dialektapp.presentation.screens.home.viewmodel.HomeViewModel
+import com.example.dialektapp.presentation.screens.home.HomeViewModel
 import com.example.dialektapp.ui.theme.*
 
 private val TileSpacing = 12.dp
+private const val TAG = "DailyStreakSection"
 
 @Composable
 fun DailyStreakSection(
@@ -46,6 +48,7 @@ fun DailyStreakSection(
 
     LaunchedEffect(streakData?.activeDay) {
         streakData?.let {
+            // Прокручуємо до activeDay (поточний день стріку)
             if (it.activeDay > 2) {
                 listState.animateScrollToItem(
                     index = maxOf(0, it.activeDay - 3),
@@ -68,7 +71,7 @@ fun DailyStreakSection(
                     .height(200.dp),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = StreakRewardGold)
+                CircularProgressIndicator(color = AccentGold)
             }
         }
         return
@@ -99,7 +102,7 @@ fun DailyStreakSection(
                     Button(
                         onClick = { viewModel.loadStreak() },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = StreakRewardGold,
+                            containerColor = AccentGold,
                             contentColor = TextPrimaryDark
                         )
                     ) {
@@ -141,9 +144,9 @@ fun DailyStreakSection(
                         2.dp,
                         Brush.horizontalGradient(
                             colors = listOf(
-                                StreakRewardGold.copy(alpha = 0.6f),
-                                StreakRewardGold,
-                                StreakRewardGold.copy(alpha = 0.6f)
+                                AccentGold.copy(alpha = 0.6f),
+                                AccentGold,
+                                AccentGold.copy(alpha = 0.6f)
                             )
                         )
                     )
@@ -155,8 +158,11 @@ fun DailyStreakSection(
                         .padding(16.dp)
                 ) {
                     if (data.isTodayClaimAvailable) {
+                        // activeDay - це ПОТОЧНИЙ день стріку (день за який можна взяти нагороду)
+                        // activeDay = 1 -> стрік день 1, можна взяти нагороду за день 1
+                        // activeDay = 2 -> стрік день 2, можна взяти нагороду за день 2
                         RewardNotification(
-                            activeDay = if (data.activeDay == 0) 1 else data.activeDay,
+                            activeDay = data.activeDay,
                             modifier = Modifier.align(Alignment.TopEnd)
                         )
                     }
@@ -187,13 +193,38 @@ fun DailyStreakSection(
                             horizontalArrangement = Arrangement.spacedBy(TileSpacing),
                             contentPadding = PaddingValues(horizontal = 8.dp)
                         ) {
-                            val daysToShow = maxOf(data.totalDays, 7)
-                            val currentActiveDay = if (data.activeDay == 0) 1 else data.activeDay
+                            // Визначаємо скільки днів показувати:
+                            // 1. Якщо totalDays > 0, показуємо max(totalDays, activeDay + 7)
+                            // 2. Якщо totalDays = 0 або дуже малий, показуємо activeDay + 7
+                            // 3. Завжди мінімум 7 днів
+                            val minDaysToShow = 7
+                            val futureDaysBuffer = 7
+                            val daysToShow = when {
+                                data.totalDays > data.activeDay -> {
+                                    // Якщо totalDays більший за activeDay, показуємо totalDays + buffer
+                                    maxOf(data.totalDays + futureDaysBuffer, minDaysToShow)
+                                }
+
+                                else -> {
+                                    // Інакше показуємо activeDay + buffer
+                                    maxOf(data.activeDay + futureDaysBuffer, minDaysToShow)
+                                }
+                            }
+
+                            Log.d(
+                                TAG,
+                                "Streak UI: activeDay=${data.activeDay}, totalDays=${data.totalDays}, showing $daysToShow days, claimAvailable=${data.isTodayClaimAvailable}"
+                            )
 
                             itemsIndexed((1..daysToShow).toList()) { index, dayNumber ->
+                                // Логіка стану днів:
+                                // activeDay - це ПОТОЧНИЙ день стріку
+                                // - Дні < activeDay: Completed (попередні дні)
+                                // - День == activeDay: Active (поточний день стріку, можна взяти нагороду)
+                                // - Дні > activeDay: Upcoming (майбутні дні)
                                 val dayState = when {
-                                    dayNumber < currentActiveDay -> DayState.Completed
-                                    dayNumber == currentActiveDay -> DayState.Active
+                                    dayNumber < data.activeDay -> DayState.Completed
+                                    dayNumber == data.activeDay -> DayState.Active
                                     else -> DayState.Upcoming
                                 }
 
@@ -212,12 +243,13 @@ fun DailyStreakSection(
                                         )
                                     )
                                 ) {
+                                    // День з нагородою - це activeDay (поточний день стріку)
                                     DayStreakItem(
                                         dayNumber = dayNumber,
                                         dayState = dayState,
-                                        hasReward = data.isTodayClaimAvailable && dayNumber == currentActiveDay,
+                                        hasReward = data.isTodayClaimAvailable && dayNumber == data.activeDay,
                                         onRewardClick = {
-                                            if (data.isTodayClaimAvailable && dayNumber == currentActiveDay) {
+                                            if (data.isTodayClaimAvailable && dayNumber == data.activeDay) {
                                                 viewModel.showRewardDialog()
                                             }
                                         }
@@ -233,9 +265,12 @@ fun DailyStreakSection(
 
     // Показуємо діалог нагороди
     if (uiState.showRewardDialog && streakData != null) {
+        // День для claim - це activeDay (поточний день стріку)
         RewardDialog(
             day = streakData.activeDay,
             amount = streakData.todayRewardAmount,
+            isClaimingReward = uiState.isClaimingStreak,
+            claimErrorMessage = uiState.claimError,
             onDismiss = { viewModel.hideRewardDialog() },
             onClaim = { coins ->
                 viewModel.claimStreak()
@@ -256,7 +291,7 @@ private fun RewardNotification(
         Text(
             text = "Натисни на день $activeDay!",
             style = MaterialTheme.typography.bodySmall,
-            color = StreakRewardGold,
+            color = AccentGold,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp
         )
@@ -269,8 +304,8 @@ private fun RewardNotification(
                 .background(
                     brush = Brush.radialGradient(
                         colors = listOf(
-                            StreakRewardGold,
-                            StreakRewardGold.copy(alpha = 0.7f)
+                            AccentGold,
+                            AccentGold.copy(alpha = 0.7f)
                         )
                     ),
                     shape = CircleShape

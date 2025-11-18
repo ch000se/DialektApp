@@ -2,6 +2,17 @@ package com.example.dialektapp.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
+enum class ActivityType {
+    @SerializedName("INTRODUCTION")
+    INTRODUCTION,
+    @SerializedName("READING")
+    READING,
+    @SerializedName("EXPLAINING")
+    EXPLAINING,
+    @SerializedName("TEST")
+    TEST
+}
+
 data class CourseDto(
     @SerializedName("id")
     val id: Int,
@@ -63,7 +74,7 @@ data class ActivityDto(
     @SerializedName("name")
     val name: String,
     @SerializedName("type")
-    val type: String, // "INTRODUCTION", "READING", "EXPLAINING", "TEST"
+    val type: ActivityType,
     @SerializedName("duration")
     val duration: String,
     @SerializedName("is_unlocked")

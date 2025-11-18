@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dialektapp.domain.model.User
-import com.example.dialektapp.domain.usecases.LoginUseCase
-import com.example.dialektapp.domain.usecases.ValidateLoginUseCase
+import com.example.dialektapp.domain.usecases.auth.LoginUseCase
+import com.example.dialektapp.domain.usecases.validation.ValidateLoginUseCase
 import com.example.dialektapp.domain.util.NetworkError
 import com.example.dialektapp.domain.util.Result
 import com.example.dialektapp.domain.util.ValidationResult
@@ -14,11 +14,14 @@ import com.example.dialektapp.domain.util.onSuccess
 import com.example.dialektapp.presentation.util.UiEvent
 import com.example.dialektapp.presentation.util.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,14 +31,14 @@ class LoginViewModel @Inject constructor(
     private val validateLogin: ValidateLoginUseCase,
 ) : ViewModel() {
 
-    private val _uiEvent = MutableSharedFlow<UiEvent>(
-        replay = 0,
-        extraBufferCapacity = 1,
-    )
-    val uiEvent = _uiEvent.asSharedFlow()
+    private val _uiEvent = Channel<UiEvent>(Channel.BUFFERED)
+    val uiEvent = _uiEvent.receiveAsFlow()
 
     private val _loginState = MutableStateFlow(LoginState())
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
+
+    private val TAG = "LoginViewModel"
+    private var loginJob: Job? = null
 
     fun updateUsername(username: String) {
         _loginState.value = _loginState.value.copy(username = username)
@@ -83,40 +86,44 @@ class LoginViewModel @Inject constructor(
     fun login() {
         val username = _loginState.value.username
         val password = _loginState.value.password
-        Log.d("LoginViewModel", "Login attempt: username=$username")
+        Log.d(TAG, "Login attempt: username=$username")
 
         val validationResult = validateLogin(username, password)
         if (validationResult is ValidationResult.Error) {
             processInputValidationType(validationResult)
-            Log.d("LoginViewModel", "Validation failed: ${validationResult.errors}")
+            Log.d(TAG, "Validation failed: ${validationResult.errors}")
             return
         }
 
-        viewModelScope.launch {
-            _loginState.value =
-                _loginState.value.copy(isLoading = true)
-            Log.d("LoginViewModel", "Calling LoginUseCase...")
+        loginJob?.cancel()
+        loginJob = viewModelScope.launch {
+            _loginState.value = _loginState.value.copy(isLoading = true)
+            Log.d(TAG, "Calling LoginUseCase...")
             val result: Result<Unit, NetworkError> =
                 loginUser.invoke(username, password)
 
             result
                 .onSuccess { user ->
                     _loginState.value = _loginState.value.copy(isLoading = false)
-                    Log.d("LoginViewModel", "Login successful: $user")
-                    _uiEvent.emit(UiEvent.ShowSnackbar("Вхід успішний! Ласкаво просимо!"))
-                    _uiEvent.emit(UiEvent.Navigate)
+                    Log.d(TAG, "Login successful: $user")
+                    _uiEvent.send(UiEvent.Navigate)
                 }
                 .onError { error ->
                     _loginState.value = _loginState.value.copy(
                         isLoading = false,
                         errorMessageLoginProcess = error
                     )
-                    Log.d("LoginViewModel", "Login error: $error")
+                    Log.d(TAG, "Login error: $error")
 
-                    _uiEvent.emit(
-                        UiEvent.ShowErrorSnackbar(error)
-                    )
+                    _uiEvent.send(UiEvent.ShowErrorSnackbar(error))
                 }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        loginJob?.cancel()
+        _uiEvent.close()
+        Log.d(TAG, "LoginViewModel cleared, jobs cancelled")
     }
 }
